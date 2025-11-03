@@ -1,0 +1,4 @@
+# Monorepo rules
+- FE: Angular, BE: Django REST, DB: MySQL (docker)
+- API versioning: /api/v1/...
+- Auth: JWT + Google Sign-In

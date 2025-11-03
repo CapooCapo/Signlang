@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+backend/static/
+media/
+node_modules/
+dist/
+.angular/
+db_data/
+.DS_Store
+Thumbs.db

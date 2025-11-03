@@ -1,0 +1,10 @@
+{
+  "venvPath": "/home/giahoang/.venvs",
+  "venv": "signlang",
+  "typeCheckingMode": "basic",
+  "executionEnvironments": [
+    { "root": "./", "extraPaths": ["./"] }
+  ],
+  "exclude": ["**/migrations/**", ".venv", "venv", "node_modules"]
+}
+
