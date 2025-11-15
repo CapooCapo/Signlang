@@ -1,0 +1,98 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, dev ]
+  pull_request:
+
+jobs:
+  backend:
+    name: Backend (Django)
+    runs-on: ubuntu-latest
+
+    services:
+      db:
+        image: mysql:8.0
+        env:
+          MYSQL_DATABASE: signlang
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_USER: signlang
+          MYSQL_PASSWORD: signlang
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -u root -proot"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+
+    env:
+      DB_HOST: 127.0.0.1
+      DB_PORT: 3306
+      DB_NAME: signlang
+      DB_USER: signlang
+      DB_PASSWORD: signlang
+      DJANGO_SETTINGS_MODULE: config.settings  # đổi nếu khác
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install deps
+        run: |
+          cd apps/api
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Wait for DB
+        run: |
+          for i in {1..30}; do
+            if mysql -h 127.0.0.1 -u root -proot -e "SELECT 1" &>/dev/null; then
+              echo "DB ready"; exit 0
+            fi
+            echo "Waiting for DB..."
+            sleep 2
+          done
+          echo "DB not ready"; exit 1
+
+      - name: Migrate + Test
+        run: |
+          cd apps/api
+          python manage.py migrate --noinput
+          python manage.py test
+
+  frontend:
+    name: Frontend (Angular)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+
+      - name: Install deps
+        run: |
+          cd apps/web
+          npm ci
+
+      - name: Lint (optional)
+        run: |
+          cd apps/web
+          npm run lint --if-present
+
+      - name: Build
+        run: |
+          cd apps/web
+          npm run build
+
