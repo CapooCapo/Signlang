@@ -1,0 +1,259 @@
+/* Reset nhỏ */
+* {
+  box-sizing: border-box;
+}
+
+:root {
+  --bg: #0f1120;
+  --card: #15172b;
+  --text: #eaeaf0;
+  --muted: #b9bbd0;
+  --primary: #6d5efc;
+}
+
+html,
+body {
+  background: var(--bg);
+  color: var(--text);
+}
+
+.container {
+  max-width: 1140px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+/* HERO */
+.hero {
+  padding: 3.5rem 0 1rem;
+  background:
+    radial-gradient(1200px 400px at 10% -10%, rgba(109, 94, 252, .35), transparent 60%),
+    radial-gradient(1200px 400px at 90% -20%, rgba(0, 216, 255, .20), transparent 60%);
+}
+
+.hero__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+
+  @media (min-width: 980px) {
+    grid-template-columns: 1.1fr .9fr;
+    align-items: center;
+  }
+}
+
+.hero__content h1 {
+  font-size: clamp(2rem, 4vw, 3rem);
+  line-height: 1.15;
+  margin: 0 0 .6rem;
+}
+
+.grad {
+  background: linear-gradient(90deg, #9b8bff, #00d8ff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.sub {
+  color: var(--muted);
+  margin: .4rem 0 1rem;
+  max-width: 48ch;
+}
+
+.hero__actions {
+  display: flex;
+  gap: .8rem;
+  margin: 1rem 0 1.4rem;
+}
+
+.hero__image {
+  display: block;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, .35);
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: .6rem;
+  max-width: 520px;
+
+  li {
+    list-style: none;
+    background: var(--card);
+    border: 1px solid rgba(255, 255, 255, .06);
+    border-radius: 12px;
+    padding: .8rem;
+
+    strong {
+      font-size: 1.3rem;
+    }
+
+    span {
+      display: block;
+      color: var(--muted);
+      font-size: .9rem;
+    }
+  }
+}
+
+/* BUTTONS */
+.btn {
+  padding: .8rem 1rem;
+  border-radius: 12px;
+  font-weight: 700;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+
+  &--primary {
+    background: var(--primary);
+    color: #fff;
+  }
+
+  &--ghost {
+    background: rgba(255, 255, 255, .06);
+    color: var(--text);
+  }
+}
+
+/* FEATURES */
+.features {
+  padding: 3rem 0;
+}
+
+.features h2 {
+  font-size: 2rem;
+  margin: 0 0 .2rem;
+}
+
+.features .lead {
+  color: var(--muted);
+  margin-bottom: 1.2rem;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+
+  @media (min-width: 900px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid rgba(255, 255, 255, .06);
+  border-radius: 16px;
+  padding: 1rem;
+  display: grid;
+  gap: .6rem;
+}
+
+.card .icon {
+  font-size: 1.5rem;
+}
+
+/* SHOWCASE */
+.showcase {
+  padding: 3rem 0;
+}
+
+.grid {
+  display: grid;
+  gap: 1.2rem;
+  grid-template-columns: 1fr;
+  align-items: center;
+
+  @media (min-width: 980px) {
+    grid-template-columns: 1.1fr .9fr;
+  }
+}
+
+.checks {
+  margin: .6rem 0 0;
+  padding-left: 1rem;
+
+  li {
+    margin: .3rem 0;
+  }
+}
+
+.images {
+  display: grid;
+  gap: .8rem;
+  grid-template-columns: 1fr 1fr;
+}
+
+.images img {
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, .06);
+}
+
+/* TESTIMONIALS */
+.testimonials {
+  padding: 3rem 0;
+  background: linear-gradient(180deg, rgba(255, 255, 255, .02), transparent);
+}
+
+.t-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 1fr;
+
+  @media (min-width: 900px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+blockquote {
+  margin: 0;
+  padding: 1rem;
+  background: var(--card);
+  border: 1px solid rgba(255, 255, 255, .06);
+  border-radius: 14px;
+}
+
+blockquote footer {
+  color: var(--muted);
+  margin-top: .4rem;
+}
+
+/* FAQ */
+.faq {
+  padding: 3rem 0;
+}
+
+details {
+  background: var(--card);
+  border: 1px solid rgba(255, 255, 255, .06);
+  border-radius: 12px;
+  padding: .8rem 1rem;
+  margin-bottom: .6rem;
+}
+
+summary {
+  cursor: pointer;
+  font-weight: 700;
+}
+
+/* CTA */
+.cta {
+  padding: 3rem 0 4rem;
+}
+
+.callout {
+  background: linear-gradient(135deg, rgba(109, 94, 252, .18), rgba(0, 216, 255, .12));
+  border: 1px solid rgba(255, 255, 255, .1);
+  border-radius: 16px;
+  padding: 1.2rem;
+  text-align: center;
+}
+
+.callout h3 {
+  margin: 0 0 .4rem;
+}

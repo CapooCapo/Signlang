@@ -1,38 +1,40 @@
-version: "3.9"
 
-name: signlang
-
-x-env: &default-env
-  TZ: Asia/Ho_Chi_Minh
+networks:
+  signnet:
 
 services:
-  # ---------- FRONTEND (Angular) ----------
-  web:
-    build: ./apps/web
-    command: sh entrypoint.sh
-    working_dir: /app
+  # ---------- DATABASE ----------
+  db:
+    image: mysql:8
+    container_name: signlang-db-1
     environment:
-      <<: *default-env
-      # Dev: gọi thẳng API & WS qua cổng 8000
-      API_BASE: "http://localhost:8000/api/v1"
-      WS_URL: "ws://localhost:8000/ws"
-    volumes:
-      - ./apps/web:/app
+      MYSQL_DATABASE: signlang
+      MYSQL_USER: sign
+      MYSQL_PASSWORD: signpass
+      MYSQL_ROOT_PASSWORD: root
     ports:
-      - "4200:4200"      # ng serve
-    depends_on:
-      api:
-        condition: service_started
-    networks: [ signnet ]
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -u$${MYSQL_USER} -p$${MYSQL_PASSWORD} --silent"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    networks: [signnet]
 
-  # ---------- BACKEND (Django + DRF + Channels) ----------
+  # ---------- REDIS ----------
+  redis:
+    image: redis:7
+    container_name: signlang-redis-1
+    ports:
+      - "6379:6379"
+    networks: [signnet]
+
+  # ---------- API (Django) ----------
   api:
     build: ./apps/api
-    command: sh entrypoint.sh
+    container_name: signlang-api-1
     working_dir: /app
-    env_file: .env
     environment:
-      <<: *default-env
       DJANGO_SETTINGS_MODULE: backend.settings
       DB_ENGINE: django.db.backends.mysql
       DB_HOST: db
@@ -40,13 +42,22 @@ services:
       DB_NAME: signlang
       DB_USER: sign
       DB_PASSWORD: signpass
-      REDIS_URL: "redis://redis:6379/0"
-      ML_BASE_URL: "http://ml:9000"
-      INTERNAL_TOKEN: "${INTERNAL_TOKEN:-supersecret-only-inside}"
-      # CORS cho Angular dev
-      CORS_ALLOWED_ORIGINS: "http://localhost:4200"
+      REDIS_URL: redis://redis:6379/0
+      ML_BASE_URL: http://ml:9000
+      CORS_ALLOWED_ORIGINS: http://localhost:4200
+      PYTHONDONTWRITEBYTECODE: "1"
+      PYTHONUNBUFFERED: "1"
+    command: >
+      bash -lc "
+      python -m pip install -U pip &&
+      pip install -r requirements.txt &&
+      python manage.py migrate &&
+      python manage.py runserver 0.0.0.0:8000
+      "
     volumes:
       - ./apps/api:/app
+      # Nếu muốn file sinh ra không bị root, bỏ comment dòng sau và export UID/GID trước khi up
+      # user: "${UID:-1000}:${GID:-1000}"
     ports:
       - "8000:8000"
     depends_on:
@@ -57,93 +68,65 @@ services:
       ml:
         condition: service_started
     healthcheck:
-      test: ["CMD-SHELL", "curl -fsS http://localhost:8000/healthz || exit 1"]
+      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:8000/healthz || exit 1"]
       interval: 15s
       timeout: 3s
       retries: 10
-    networks: [ signnet ]
+      start_period: 25s
+    networks: [signnet]
 
-  # ---------- ML SERVICE (FastAPI / ONNX / Torch) ----------
+  # ---------- ML SERVICE (Uvicorn/FastAPI) ----------
   ml:
     build: ./ml/service
-    command: uvicorn app:app --host 0.0.0.0 --port 9000
+    container_name: signlang-ml-1
     working_dir: /app
     environment:
-      <<: *default-env
       MODEL_NAME: asl_letters
       MODEL_VERSION: "1.0.0"
-      INTERNAL_TOKEN: "${INTERNAL_TOKEN:-supersecret-only-inside}"
+      PYTHONDONTWRITEBYTECODE: "1"
+      PYTHONUNBUFFERED: "1"
+      # Bật nếu host FS không hỗ trợ inotify tốt:
+      # WATCHFILES_FORCE_POLLING: "true"
+    command: >
+      bash -lc "
+      pip install -r requirements.txt &&
+      uvicorn app:app --host 0.0.0.0 --port 9000 --reload
+      "
     volumes:
       - ./ml/service:/app
       - ./ml/models:/models
+      # user: "${UID:-1000}:${GID:-1000}"
     ports:
-      - "9000:9000"    # chỉ mở dev; prod giữ trong mạng nội bộ
+      - "9000:9000"
     healthcheck:
-      test: ["CMD", "curl", "-fsS", "http://localhost:9000/docs"]
+      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:9000/health || exit 1"]
       interval: 20s
       timeout: 3s
       retries: 10
-    networks: [ signnet ]
+      start_period: 20s
+    networks: [signnet]
 
-  # ---------- DATABASE (MySQL) ----------
-  db:
-    image: mysql:8.4
-    environment:
-      <<: *default-env
-      MYSQL_DATABASE: signlang
-      MYSQL_USER: sign
-      MYSQL_PASSWORD: signpass
-      MYSQL_ROOT_PASSWORD: rootpass
-    volumes:
-      - dbdata:/var/lib/mysql
-    ports:
-      - "3306:3306"   # dev; có thể tắt ở prod
-    healthcheck:
-      test: ["CMD-SHELL", "mysqladmin ping -h localhost -uroot -prootpass --silent"]
-      interval: 10s
-      timeout: 5s
-      retries: 20
-    networks: [ signnet ]
-
-  # ---------- REDIS (queue + cache) ----------
-  redis:
-    image: redis:7-alpine
-    command: ["redis-server", "--appendonly", "yes"]
-    volumes:
-      - redisdata:/data
-    ports:
-      - "6379:6379"
-    networks: [ signnet ]
-
-  # ---------- OPTIONAL: Mongo cho log frame/keypoints ----------
-  # mongo:
-  #   image: mongo:7
-  #   volumes:
-  #     - mongodata:/data/db
-  #   ports:
-  #     - "27017:27017"
-  #   networks: [ signnet ]
-
-  # ---------- OPTIONAL: Gateway Nginx (bật khi muốn 1 cổng 80) ----------
-  # nginx:
-  #   image: nginx:alpine
-  #   volumes:
-  #     - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-  #   ports:
-  #     - "80:80"
-  #   depends_on:
-  #     web:
-  #       condition: service_started
-  #     api:
-  #       condition: service_started
-  #   networks: [ signnet ]
-
-volumes:
-  dbdata:
-  redisdata:
-  mongodata:
-
-networks:
-  signnet:
-    driver: bridge
+  # ---------- FRONTEND (Angular) ----------
+  web:
+   image: node:20-slim
+   container_name: signlang-web-dev
+   working_dir: /app
+   environment:
+     API_BASE: "http://host.docker.internal:8000/api/v1"
+     WS_URL: "ws://host.docker.internal:8000/ws"
+     CHOKIDAR_USEPOLLING: "true"
+   command: >
+     sh -lc "
+       [ -d node_modules ] || npm install &&
+       npx ng serve --host 0.0.0.0 --port 4200 --poll 1500
+     "
+   volumes:
+     - ./apps/web:/app
+     - /app/node_modules
+   ports:
+     - "4200:4200"
+   depends_on:
+     api:
+       condition: service_started
+   networks: [signnet]
 
