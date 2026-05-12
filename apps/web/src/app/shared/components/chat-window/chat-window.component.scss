@@ -1,0 +1,123 @@
+.chat-container {
+  display: flex;
+  flex-direction: column;
+  height: 600px;
+  border-radius: 1rem;
+  overflow: hidden;
+}
+
+.chat-messages {
+  flex: 1;
+  padding: 1.5rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  scroll-behavior: smooth;
+}
+
+.message-item {
+  display: flex;
+  gap: 0.75rem;
+  max-width: 80%;
+
+  .message-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+  }
+
+  .message-bubble {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 0.75rem 1rem;
+    border-radius: 0 1rem 1rem 1rem;
+    
+    .author-name {
+      font-weight: 600;
+      font-size: 0.8rem;
+      margin-bottom: 0.25rem;
+      display: block;
+      color: var(--primary-color);
+    }
+
+    p { margin: 0; font-size: 0.95rem; }
+  }
+
+  .message-time {
+    font-size: 0.7rem;
+    opacity: 0.5;
+    margin-top: 0.25rem;
+    display: block;
+  }
+
+  &.own-message {
+    align-self: flex-end;
+    flex-direction: row-reverse;
+
+    .message-bubble {
+      background: var(--primary-color);
+      border-radius: 1rem 0 1rem 1rem;
+      color: white;
+      .author-name { color: white; opacity: 0.8; }
+    }
+    .message-time { text-align: right; }
+  }
+}
+
+.typing-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  opacity: 0.7;
+  padding: 0.5rem;
+
+  .dots {
+    display: flex;
+    gap: 2px;
+    span {
+      width: 4px;
+      height: 4px;
+      background: currentColor;
+      border-radius: 50%;
+      animation: bounce 1s infinite;
+      &:nth-child(2) { animation-delay: 0.2s; }
+      &:nth-child(3) { animation-delay: 0.4s; }
+    }
+  }
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
+.chat-input {
+  display: flex;
+  gap: 0.5rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+
+  input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: white;
+    outline: none;
+  }
+
+  button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.25rem;
+    transition: transform 0.2s;
+    &:hover { transform: scale(1.1); }
+    &:disabled { opacity: 0.3; }
+  }
+
+  .btn-send {
+    color: var(--primary-color);
+  }
+}

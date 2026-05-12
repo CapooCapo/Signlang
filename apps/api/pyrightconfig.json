@@ -3,8 +3,17 @@
   "venv": "signlang",
   "typeCheckingMode": "basic",
   "executionEnvironments": [
-    { "root": "./", "extraPaths": ["./"] }
+    {
+      "root": "./",
+      "extraPaths": [
+        "../../"
+      ]
+    }
   ],
-  "exclude": ["**/migrations/**", ".venv", "venv", "node_modules"]
+  "exclude": [
+    "**/migrations/**",
+    ".venv",
+    "venv",
+    "node_modules"
+  ]
 }
-

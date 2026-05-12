@@ -7,6 +7,8 @@ channels==4.1.0
 daphne==4.1.2
 celery==5.4.0
 redis==5.0.7
-mysqlclient==2.2.4
+psycopg2-binary==2.9.9
 requests==2.32.3
-django-cors-headers
+django-stubs
+firebase-admin
+PyJWT==2.10.1

@@ -1,0 +1,51 @@
+<div class="container community-page">
+  <header class="page-header">
+    <h1 class="grad-text">Cộng đồng của bạn</h1>
+    <p>Tham gia các nhóm để thảo luận và luyện tập cùng mọi người.</p>
+    <button class="btn btn--primary">
+      <span>➕</span> Tạo nhóm mới
+    </button>
+  </header>
+
+  <div class="groups-grid">
+    @for (group of groups(); track group.id) {
+      <div class="group-card glass animate-fade">
+        <div class="banner-wrapper">
+          <img [src]="group.image || 'assets/default-group.png'" class="group-banner">
+        </div>
+        
+        <div class="group-info">
+          <h3>{{ group.name }}</h3>
+          <p class="description">{{ group.description }}</p>
+          
+          <div class="meta">
+            <div class="stat">
+              <span>👥</span>
+              <span>{{ group.member_count }} thành viên</span>
+            </div>
+          </div>
+
+          <div class="actions">
+            @if (group.is_owner) {
+              <button class="btn btn--primary btn--full" (click)="onOpenChat(group.id)">
+                <span>⚙️</span> Quản lý nhóm
+              </button>
+            } @else if (group.is_member) {
+              <button class="btn btn--primary btn--full" (click)="onOpenChat(group.id)">
+                <span>💬</span> Vào nhóm chat
+              </button>
+            } @else {
+              <button class="btn btn--secondary btn--full" (click)="onJoin(group.id)">
+                <span>✨</span> Tham gia nhóm
+              </button>
+            }
+          </div>
+        </div>
+      </div>
+    } @empty {
+      <div class="empty-state glass">
+        <p>Chưa có nhóm nào được tạo.</p>
+      </div>
+    }
+  </div>
+</div>

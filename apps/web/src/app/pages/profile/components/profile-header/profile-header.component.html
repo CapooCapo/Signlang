@@ -1,0 +1,43 @@
+<div class="profile-header glass">
+  <div class="cover-image">
+    <img [src]="userProfile().profile.cover_image || 'assets/default-cover.jpg'" alt="Cover">
+    @if (isOwnProfile()) {
+      <button class="edit-cover-btn" (click)="onEdit()">📷 Đổi ảnh bìa</button>
+    }
+  </div>
+
+  <div class="header-content">
+    <div class="avatar-section">
+      <div class="avatar-container">
+        <img [src]="userProfile().profile.avatar || 'assets/default-avatar.png'" [alt]="userProfile().full_name" class="avatar">
+        @if (isOwnProfile()) {
+          <button class="edit-avatar-btn" (click)="onEdit()">📷</button>
+        }
+      </div>
+    </div>
+
+    <div class="user-meta">
+      <div class="name-row">
+        <h1 class="full-name">{{ userProfile().full_name }}</h1>
+        <span class="role-badge" [attr.data-role]="userProfile().role">{{ userProfile().role }}</span>
+      </div>
+      <p class="username">@{{ userProfile().email.split('@')[0] }}</p>
+      <p class="bio" *ngIf="userProfile().profile.bio">{{ userProfile().profile.bio }}</p>
+      
+      <div class="stats-row">
+        <span><strong>{{ userProfile().profile.city || 'Chưa cập nhật' }}</strong></span>
+        <span class="dot">•</span>
+        <span>Tham gia từ {{ userProfile().profile.created_at | date:'MMMM yyyy' }}</span>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      @if (isOwnProfile()) {
+        <button class="btn btn--primary" (click)="onEdit()">Chỉnh sửa trang cá nhân</button>
+      } @else {
+        <button class="btn btn--primary">Nhắn tin</button>
+      }
+      <button class="btn btn--ghost" (click)="onShare()">Chia sẻ</button>
+    </div>
+  </div>
+</div>

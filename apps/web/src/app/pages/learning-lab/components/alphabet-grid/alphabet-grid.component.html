@@ -1,0 +1,11 @@
+<div class="alphabet-container">
+  <h3>Interactive Alphabet</h3>
+  <div class="grid">
+    @for (letter of alphabet; track letter) {
+      <div class="letter-card glass-hover">
+        <div class="letter">{{ letter }}</div>
+        <div class="description">{{ getHandSignDescription(letter) }}</div>
+      </div>
+    }
+  </div>
+</div>

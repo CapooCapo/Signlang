@@ -1,0 +1,97 @@
+<div class="community-layout container">
+  <!-- LEFT SIDEBAR -->
+  <aside class="sidebar-left">
+    <nav class="side-nav glass">
+      <a routerLink="/community" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" class="nav-item">
+        <span class="icon">📰</span> Bảng tin
+      </a>
+      <a routerLink="/community/groups" routerLinkActive="active" class="nav-item">
+        <span class="icon">👥</span> Nhóm cộng đồng
+      </a>
+      <a routerLink="/courses" class="nav-item">
+        <span class="icon">🎓</span> Khóa học
+      </a>
+      <a routerLink="/community/notifications" class="nav-item">
+        <span class="icon">🔔</span> Thông báo
+      </a>
+    </nav>
+
+    <div class="trending-groups glass">
+      <h3>Nhóm đang hot</h3>
+      @for (group of groups().slice(0, 5); track group.id) {
+        <a [routerLink]="['/community/groups', group.id]" class="group-mini">
+          <img [src]="group.image || 'assets/default-group.png'" class="mini-avatar">
+          <div class="info">
+            <span class="name">{{ group.name }}</span>
+            <span class="members">{{ group.member_count }} thành viên</span>
+          </div>
+        </a>
+      }
+    </div>
+  </aside>
+
+  <!-- CENTER CONTENT -->
+  <main class="feed-content">
+    <!-- Create Post -->
+    <div class="create-post glass animate-fade">
+      <div class="input-row">
+        <img src="assets/default-avatar.png" class="avatar">
+        <div class="fake-input" (click)="isCreatingPost = true" *ngIf="!isCreatingPost">
+          Bạn đang nghĩ gì?
+        </div>
+        <textarea 
+          *ngIf="isCreatingPost"
+          [(ngModel)]="newPostContent" 
+          placeholder="Chia sẻ kinh nghiệm hoặc hỏi đáp..."
+          autoFocus>
+        </textarea>
+      </div>
+      @if (isCreatingPost) {
+        <div class="actions-row animate-slide-in">
+          <button class="btn-tool">📷 Ảnh/Video</button>
+          <button class="btn-tool">❓ Câu hỏi</button>
+          <div class="spacer"></div>
+          <button class="btn btn--ghost" (click)="isCreatingPost = false">Hủy</button>
+          <button class="btn btn--primary" (click)="onCreatePost()" [disabled]="!newPostContent.trim()">Đăng bài</button>
+        </div>
+      }
+    </div>
+
+    <!-- Feed -->
+    <div class="posts-list">
+      @for (post of posts(); track post.id) {
+        <app-post-card [post]="post"></app-post-card>
+      } @empty {
+        <div class="empty-feed glass">
+          <p>Chưa có bài viết nào. Hãy là người đầu tiên chia sẻ!</p>
+        </div>
+      }
+    </div>
+  </main>
+
+  <!-- RIGHT SIDEBAR -->
+  <aside class="sidebar-right">
+    <div class="promoted-courses glass">
+      <h3>Khóa học nổi bật</h3>
+      <div class="course-mini-card">
+        <div class="badge">🔥 Hot</div>
+        <h4>Giao tiếp Sign Language cấp tốc</h4>
+        <p>Trung tâm Saigon Sign</p>
+        <button class="btn btn--primary btn--sm">Xem ngay</button>
+      </div>
+    </div>
+
+    <div class="online-users glass">
+      <h3>Người dùng online</h3>
+      <div class="user-list">
+        <div class="user-item">
+          <div class="avatar-container online">
+            <img src="assets/default-avatar.png" class="mini-avatar">
+          </div>
+          <span>Nguyễn Văn A</span>
+        </div>
+        <!-- More mock users -->
+      </div>
+    </div>
+  </aside>
+</div>

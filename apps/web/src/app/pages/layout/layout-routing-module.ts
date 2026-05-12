@@ -1,19 +1,36 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { HomePage } from './pages/home-page/home-page';
-import { Layout } from './layout';
-import { Course } from './pages/course/course';
+import { HomePageComponent } from './pages/home-page/home-page.component';
+import { LayoutComponent } from './layout.component';
+import { AuthGuard } from '../../core/guards/auth.guard';
 
 const routes: Routes = [
   {
     path: '',
-    component: Layout,
+    component: LayoutComponent,
     children: [
-      { path: '', component: HomePage, pathMatch: 'full' },
-      // thêm trang khác:
-        { path: 'course', component: Course}
-      // { path: 'learn', component: LearnPage },
-      // { path: 'profile', component: ProfilePage },
+      { path: '', component: HomePageComponent, pathMatch: 'full' },
+      {
+        path: 'learning-lab',
+        canActivate: [AuthGuard],
+        loadChildren: () => import('../learning-lab/learning-lab.module').then(m => m.LearningLabModule)
+      },
+      {
+        path: 'courses',
+        loadChildren: () => import('../courses/courses.module').then(m => m.CoursesModule)
+      },
+      {
+        path: 'community',
+        loadChildren: () => import('../community/community.module').then(m => m.CommunityModule)
+      },
+      {
+        path: 'profile',
+        loadChildren: () => import('../profile/profile.module').then(m => m.ProfileModule)
+      },
+      {
+        path: 'settings',
+        loadChildren: () => import('../settings/settings.module').then(m => m.SettingsModule)
+      }
     ]
   }
 ];

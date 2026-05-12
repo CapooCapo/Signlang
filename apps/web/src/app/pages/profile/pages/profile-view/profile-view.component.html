@@ -1,0 +1,28 @@
+<div class="container animate-fade">
+  @if (isLoading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Đang tải trang cá nhân...</p>
+    </div>
+  } @else if (error()) {
+    <div class="error-state glass">
+      <h2>⚠️ Rất tiếc</h2>
+      <p>{{ error() }}</p>
+      <button class="btn btn--primary" routerLink="/">Quay lại trang chủ</button>
+    </div>
+  } @else if (userProfile()) {
+    <div class="profile-layout">
+      <app-profile-header 
+        [userProfile]="userProfile()!" 
+        [isOwnProfile]="isOwnProfile()"
+        (edit)="onEdit()"
+        (share)="onShare()">
+      </app-profile-header>
+
+      <app-profile-tabs 
+        [userProfile]="userProfile()!"
+        [isOwnProfile]="isOwnProfile()">
+      </app-profile-tabs>
+    </div>
+  }
+</div>

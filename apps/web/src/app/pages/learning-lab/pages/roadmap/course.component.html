@@ -1,0 +1,46 @@
+<div class="course-roadmap">
+  <div class="container">
+    <header class="roadmap-header">
+      <h1 class="grad-text">Lộ trình học tập</h1>
+      <p>Hoàn thành các bài học để mở khóa kiến thức mới</p>
+    </header>
+
+    <app-progress-tracker [progress]="progress()"></app-progress-tracker>
+
+    <div class="layout-grid">
+      <aside class="layout-grid__sidebar">
+        <app-course-sidebar 
+          [courses]="courses()" 
+          [currentCourseId]="currentCourseId()"
+          [currentLessonId]="currentLessonId()"
+          (selectLesson)="onSelectLesson($any($event))"
+          (selectLockedCourse)="onSelectLockedCourse($any($event))">
+        </app-course-sidebar>
+      </aside>
+
+      <main class="layout-grid__content">
+        @if (selectedLesson()) {
+          <app-lesson-viewer 
+            [lesson]="selectedLesson()!"
+            [isLastLesson]="isLastLesson()"
+            (complete)="onCompleteLesson()"
+            (next)="onNextLesson()">
+          </app-lesson-viewer>
+        }
+
+        @if (selectedLockedCourse()) {
+          <app-locked-course-card 
+            [course]="selectedLockedCourse()!">
+          </app-locked-course-card>
+        }
+        
+        @if (!selectedLesson() && !selectedLockedCourse()) {
+          <div class="empty-selection glass">
+            <h2>Sẵn sàng bắt đầu?</h2>
+            <p>Chọn một bài học từ danh sách bên trái để tiếp tục lộ trình của bạn.</p>
+          </div>
+        }
+      </main>
+    </div>
+  </div>
+</div>

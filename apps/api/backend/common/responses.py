@@ -5,7 +5,15 @@ JsonObj  = Mapping[str, Any]
 JsonList = Sequence[JsonObj]
 
 
-def res_message(status_code: int,message: str, data: JsonObj | JsonList | None = None) -> Response:
+def res_message(status_code: int, message: str, data: Any = None) -> Response:
+    """
+    Standardized success response format.
+    """
     return Response(
-        {"status": status_code, "message": message, "object": data or {}},status = status_code,
+        {
+            "status": status_code,
+            "message": message,
+            "object": data if data is not None else {}
+        },
+        status=status_code,
     )

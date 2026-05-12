@@ -1,0 +1,25 @@
+.layout-main {
+  padding-top: 6rem; /* 96px - enough to clear the 72px navbar + extra breathing room */
+  min-height: calc(100vh - var(--navbar-height));
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  z-index: 1;
+
+  &::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--overlay-dark);
+    backdrop-filter: blur(4px);
+    z-index: -1;
+    pointer-events: none;
+  }
+
+  @media (max-width: 768px) {
+    padding-top: 5rem;
+  }
+}

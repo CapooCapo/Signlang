@@ -1,0 +1,60 @@
+<div class="quiz glass">
+  @if (!showResults) {
+    <div class="quiz__header">
+      <span class="step">Question {{ currentQuestionIndex + 1 }} of {{ quiz.questions.length }}</span>
+      <h3>{{ currentQuestion.question }}</h3>
+    </div>
+
+    <div class="quiz__options">
+      @for (option of currentQuestion.options; track option) {
+        <button 
+          class="option-btn"
+          [class.option-btn--selected]="selectedOption === option"
+          [class.option-btn--correct]="isAnswered && option === currentQuestion.correctAnswer"
+          [class.option-btn--wrong]="isAnswered && selectedOption === option && !isCorrect"
+          [disabled]="isAnswered"
+          (click)="selectOption(option)">
+          {{ option }}
+        </button>
+      }
+    </div>
+
+    @if (isAnswered) {
+      <div class="quiz__feedback">
+        <p [class.correct]="isCorrect" [class.wrong]="!isCorrect">
+          {{ isCorrect ? '✨ Correct!' : '❌ Not quite right.' }}
+        </p>
+        @if (currentQuestion.explanation) {
+          <p class="explanation">{{ currentQuestion.explanation }}</p>
+        }
+      </div>
+    }
+
+    <div class="quiz__footer">
+      @if (!isAnswered) {
+        <button class="btn btn--primary" [disabled]="!selectedOption" (click)="submitAnswer()">
+          Check Answer
+        </button>
+      } @else {
+        <button class="btn btn--primary" (click)='nextQuestion()'>
+          {{ currentQuestionIndex === quiz.questions.length - 1 ? 'See Results' : 'Next Question' }}
+        </button>
+      }
+    </div>
+  } @else {
+    <div class="results">
+      <div class="results__icon">{{ score === quiz.questions.length ? '🏆' : '📚' }}</div>
+      <h2>Quiz Completed!</h2>
+      <p>You scored {{ score }} out of {{ quiz.questions.length }}</p>
+      
+      <div class="results__actions">
+        <button class="btn btn--ghost" (click)="restart()">Try Again</button>
+        @if (score === quiz.questions.length) {
+          <button class="btn btn--primary" disabled>
+            Completed ✓
+          </button>
+        }
+      </div>
+    </div>
+  }
+</div>

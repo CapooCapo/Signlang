@@ -1,0 +1,53 @@
+<div class="login-container">
+  <div class="login-card">
+    <div class="login-header">
+      <img src="/logo.png" alt="SignLang Logo" class="logo" />
+      <h1>Chào mừng trở lại</h1>
+      <p>Đăng nhập để tiếp tục hành trình học ngôn ngữ ký hiệu của bạn</p>
+    </div>
+
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+      <app-form-input
+        id="email"
+        label="Email"
+        type="email"
+        placeholder="example@email.com"
+        icon="📧"
+        [control]="$any(f['email'])"
+      ></app-form-input>
+
+      <app-form-input
+        id="password"
+        label="Mật khẩu"
+        type="password"
+        placeholder="••••••••"
+        icon="🔒"
+        [control]="$any(f['password'])"
+      ></app-form-input>
+
+      <div *ngIf="errorMessage" class="server-error">
+        {{ errorMessage }}
+      </div>
+
+      <button type="submit" class="btn-submit" [disabled]="loading || googleLoading">
+        <span *ngIf="!loading">Đăng nhập</span>
+        <span *ngIf="loading" class="loader"></span>
+      </button>
+
+      <div class="divider">
+        <span>Hoặc</span>
+      </div>
+
+      <button type="button" class="btn-google" (click)="loginWithGoogle()" [disabled]="loading || googleLoading">
+        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" />
+        <span *ngIf="!googleLoading">Tiếp tục với Google</span>
+        <span *ngIf="googleLoading" class="loader loader--blue"></span>
+      </button>
+
+      <div class="login-footer">
+        <p>Chưa có tài khoản? <a routerLink="/register">Đăng ký ngay</a></p>
+        <a routerLink="/forgot-password" class="forgot-link">Quên mật khẩu?</a>
+      </div>
+    </form>
+  </div>
+</div>

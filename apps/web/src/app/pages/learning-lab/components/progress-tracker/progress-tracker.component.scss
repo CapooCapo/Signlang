@@ -1,0 +1,52 @@
+.tracker {
+  display: flex;
+  align-items: center;
+  gap: 3rem;
+  padding: 1rem 2rem;
+  border-radius: var(--radius);
+  margin-bottom: 2rem;
+}
+
+.stat {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+
+  &__icon {
+    font-size: 1.5rem;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+  }
+
+  &__info {
+    display: flex;
+    flex-direction: column;
+
+    .label {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .value {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+  }
+}
+
+.continue-btn {
+  margin-left: auto;
+  
+  .btn--sm {
+    padding: 0.5rem 1rem;
+    font-size: 0.8rem;
+  }
+}

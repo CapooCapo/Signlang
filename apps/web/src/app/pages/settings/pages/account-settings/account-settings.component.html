@@ -1,0 +1,45 @@
+<div class="settings-page">
+  <header>
+    <h3>Thông tin tài khoản</h3>
+    <p>Cập nhật thông tin cá nhân của bạn.</p>
+  </header>
+
+  @if (isLoading) {
+    <div class="loading">Đang tải...</div>
+  } @else {
+    <form [formGroup]="profileForm" (ngSubmit)="onSubmit()" class="settings-form">
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Họ và tên</label>
+          <input type="text" formControlName="full_name">
+        </div>
+
+        <div class="form-group">
+          <label>Thành phố</label>
+          <input type="text" formControlName="city">
+        </div>
+
+        <div class="form-group full-width">
+          <label>Bio (Giới thiệu ngắn)</label>
+          <textarea formControlName="bio" rows="3"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Số điện thoại</label>
+          <input type="text" formControlName="phone">
+        </div>
+
+        <div class="form-group">
+          <label>Website</label>
+          <input type="text" formControlName="website">
+        </div>
+      </div>
+
+      <div class="actions">
+        <button type="submit" class="btn btn--primary" [disabled]="isSaving || profileForm.invalid">
+          {{ isSaving ? 'Đang lưu...' : 'Lưu thay đổi' }}
+        </button>
+      </div>
+    </form>
+  }
+</div>

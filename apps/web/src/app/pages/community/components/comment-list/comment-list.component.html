@@ -1,0 +1,27 @@
+<div class="comments-section">
+  <div class="comment-input">
+    <input 
+      type="text" 
+      [(ngModel)]="newComment" 
+      placeholder="Viết bình luận..." 
+      (keyup.enter)="onSubmit()">
+    <button (click)="onSubmit()" [disabled]="!newComment.trim()">
+      <span class="icon">✈️</span>
+    </button>
+  </div>
+
+  <div class="comments-list">
+    @for (comment of comments; track comment.id) {
+      <div class="comment-item animate-slide-in">
+        <img [src]="comment.author.avatar || 'assets/default-avatar.png'" class="comment-avatar">
+        <div class="comment-body">
+          <div class="comment-bubble">
+            <span class="author-name">{{ comment.author.full_name }}</span>
+            <p>{{ comment.content }}</p>
+          </div>
+          <span class="comment-time">{{ comment.created_at | date:'shortTime' }}</span>
+        </div>
+      </div>
+    }
+  </div>
+</div>

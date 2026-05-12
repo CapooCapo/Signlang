@@ -1,0 +1,37 @@
+<div class="chat-container glass">
+  <div class="chat-messages" #scrollContainer>
+    @for (message of messages(); track message.id) {
+      <div class="message-item" [class.own-message]="false"> <!-- Need to check current user ID -->
+        <img [src]="message.author.avatar || 'assets/default-avatar.png'" class="message-avatar">
+        <div class="message-content">
+          <div class="message-bubble">
+            <span class="author-name">{{ message.author.full_name }}</span>
+            <p>{{ message.content }}</p>
+          </div>
+          <span class="message-time">{{ message.created_at | date:'shortTime' }}</span>
+        </div>
+      </div>
+    }
+
+    <!-- Typing Indicator -->
+    @if (typingUsers()[groupId()]?.length) {
+      <div class="typing-indicator animate-fade">
+        <div class="dots"><span></span><span></span><span></span></div>
+        <span class="text">{{ typingUsers()[groupId()]?.join(', ') }} đang nhập...</span>
+      </div>
+    }
+  </div>
+
+  <div class="chat-input">
+    <button class="btn-attach">📎</button>
+    <input 
+      type="text" 
+      [(ngModel)]="newMessage" 
+      placeholder="Nhập tin nhắn..." 
+      (input)="onTyping(true)"
+      (keyup.enter)="onSend()">
+    <button class="btn-send" (click)="onSend()" [disabled]="!newMessage.trim()">
+      ✈️
+    </button>
+  </div>
+</div>

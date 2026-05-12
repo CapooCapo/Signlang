@@ -1,0 +1,117 @@
+<main class="home">
+  <!-- HERO SECTION -->
+  <section class="hero">
+    <div class="container hero__grid">
+      <div class="hero__content">
+        <span class="badge">Nền tảng học tập AI thế hệ mới</span>
+        <h1>Giao tiếp không khoảng cách với <span class="grad-text">Ngôn ngữ ký hiệu</span></h1>
+        <p class="sub">
+          Phá bỏ rào cản ngôn ngữ với công nghệ nhận diện cử chỉ tay thời gian thực. Học nhanh hơn, nhớ lâu hơn với lộ trình thông minh.
+        </p>
+        <div class="hero__actions">
+          <a class="btn btn--primary" routerLink="/learning-lab">Bắt đầu miễn phí</a>
+          <a class="btn btn--ghost" href="#features">Xem tính năng</a>
+        </div>
+
+        <ul class="stats">
+          <li *ngFor="let c of counters">
+            <strong>{{ c.value | number }}+</strong>
+            <span>{{ c.label }}</span>
+          </li>
+        </ul>
+      </div>
+
+      <div class="hero__image">
+        <div class="img-wrapper glass">
+          <img src="assets/images/hero-banner.png" alt="SignLang AI Recognition" width="720" height="520" loading="eager" />
+        </div>
+        <div class="hero__blur-blob"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES SECTION -->
+  <section id="features" class="features">
+    <div class="container">
+      <div class="section-header">
+        <h2>Công nghệ tiên phong</h2>
+        <p>Mọi thứ bạn cần để làm chủ ngôn ngữ ký hiệu một cách chuyên nghiệp.</p>
+      </div>
+      
+      <div class="cards">
+        <article class="card glass" *ngFor="let f of features">
+          <div class="card__icon">{{ f.icon }}</div>
+          <div class="card__content">
+            <h3>{{ f.title }}</h3>
+            <p>{{ f.desc }}</p>
+          </div>
+          <div class="card__image">
+            <img [src]="f.img" [alt]="f.title" loading="lazy" />
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- SHOWCASE SECTION -->
+  <section id="showcase" class="showcase">
+    <div class="container grid">
+      <div class="showcase__content">
+        <h2>Giao diện hiện đại, tối ưu trải nghiệm</h2>
+        <p>Học mọi lúc mọi nơi trên mọi thiết bị. Giao diện được thiết kế tối giản, tập trung vào việc thực hành cử chỉ.</p>
+        <ul class="checks">
+          <li>
+            <span class="check-icon">✓</span>
+            <div>
+              <strong>Tương thích đa nền tảng</strong>
+              <p>Hoạt động mượt mà trên cả trình duyệt máy tính và điện thoại.</p>
+            </div>
+          </li>
+          <li>
+            <span class="check-icon">✓</span>
+            <div>
+              <strong>Phản hồi tức thì</strong>
+              <p>AI chấm điểm cử chỉ ngay lập tức giúp bạn sửa sai kịp thời.</p>
+            </div>
+          </li>
+        </ul>
+      </div>
+      <div class="showcase__visual">
+        <div class="mockup glass">
+          <img src="assets/images/hero-banner.png" alt="Interface Preview" loading="lazy" />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ SECTION -->
+  <section id="faq" class="faq">
+    <div class="container">
+      <div class="section-header">
+        <h2>Câu hỏi thường gặp</h2>
+      </div>
+      <div class="faq-list">
+        <details class="glass" *ngFor="let f of faqs">
+          <summary>{{ f.q }} <span class="plus">+</span></summary>
+          <div class="content">
+            <p>{{ f.a }}</p>
+          </div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA SECTION -->
+  <section class="cta">
+    <div class="container">
+      <div class="callout glass">
+        <h3>Sẵn sàng bắt đầu hành trình của bạn?</h3>
+        <p>Gia nhập cùng 15,000+ người học và bắt đầu bài học đầu tiên ngay hôm nay.</p>
+        <div class="cta__actions">
+          <a class="btn btn--primary" routerLink="/learning-lab">Vào lớp học ngay</a>
+          <a class="btn btn--ghost" routerLink="/register">Đăng ký tài khoản</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>

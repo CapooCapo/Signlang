@@ -1,0 +1,60 @@
+<div class="settings-page">
+  <header>
+    <h3>Quyền riêng tư</h3>
+    <p>Kiểm soát những ai có thể thấy hoạt động của bạn.</p>
+  </header>
+
+  @if (isLoading) {
+    <div class="loading">Đang tải cài đặt...</div>
+  } @else if (settings) {
+    <div class="settings-sections">
+      <section>
+        <div class="setting-item">
+          <div class="info">
+            <label>Hiển thị hoạt động gần đây</label>
+            <span>Bao gồm các lượt thích, bình luận và bài viết mới.</span>
+          </div>
+          <button class="toggle" [class.on]="settings.show_activity" (click)="onToggle('show_activity')">
+            <div class="slider"></div>
+          </button>
+        </div>
+
+        <div class="setting-item">
+          <div class="info">
+            <label>Hiển thị các nhóm tham gia</label>
+            <span>Người khác có thể thấy danh sách nhóm bạn đang tham gia.</span>
+          </div>
+          <button class="toggle" [class.on]="settings.show_groups" (click)="onToggle('show_groups')">
+            <div class="slider"></div>
+          </button>
+        </div>
+
+        <div class="setting-item">
+          <div class="info">
+            <label>Hiển thị tiến trình học tập</label>
+            <span>Chia sẻ các khóa học và bài học bạn đã hoàn thành.</span>
+          </div>
+          <button class="toggle" [class.on]="settings.show_learning_progress" (click)="onToggle('show_learning_progress')">
+            <div class="slider"></div>
+          </button>
+        </div>
+      </section>
+
+      <section>
+        <h4>Chế độ hiển thị trang cá nhân</h4>
+        <div class="visibility-options">
+          <button 
+            [class.active]="settings.profile_visibility === 'PUBLIC'" 
+            (click)="onVisibilityChange('PUBLIC')">
+            Công khai
+          </button>
+          <button 
+            [class.active]="settings.profile_visibility === 'PRIVATE'" 
+            (click)="onVisibilityChange('PRIVATE')">
+            Riêng tư
+          </button>
+        </div>
+      </section>
+    </div>
+  }
+</div>

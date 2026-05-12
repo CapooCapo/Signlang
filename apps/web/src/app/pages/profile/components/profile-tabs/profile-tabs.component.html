@@ -1,0 +1,37 @@
+<div class="profile-tabs-container">
+  <nav class="tabs-nav glass">
+    <button [class.active]="activeTab() === 'posts'" (click)="setTab('posts')">Bài viết</button>
+    <button *ngIf="canShowActivity" [class.active]="activeTab() === 'activity'" (click)="setTab('activity')">Hoạt động</button>
+    <button *ngIf="canShowGroups" [class.active]="activeTab() === 'groups'" (click)="setTab('groups')">Nhóm</button>
+    <button [class.active]="activeTab() === 'courses'" (click)="setTab('courses')">Khóa học</button>
+  </nav>
+
+  <div class="tab-content animate-fade">
+    @switch (activeTab()) {
+      @case ('posts') {
+        <div class="posts-grid">
+          <!-- Post components would go here -->
+          <div class="empty-state glass">Chưa có bài viết nào</div>
+        </div>
+      }
+      @case ('activity') {
+        <div class="activity-list glass">
+          <div class="activity-item">Đã tham gia nhóm "Cộng đồng Sign Language"</div>
+          <div class="activity-item">Đã bình luận vào bài viết của Nguyễn Văn A</div>
+        </div>
+      }
+      @case ('groups') {
+        <div class="groups-grid">
+          <!-- Group cards -->
+          <div class="empty-state glass">Chưa tham gia nhóm nào</div>
+        </div>
+      }
+      @case ('courses') {
+        <div class="courses-grid">
+          <!-- Course cards -->
+          <div class="empty-state glass">Chưa đăng ký khóa học nào</div>
+        </div>
+      }
+    }
+  </div>
+</div>

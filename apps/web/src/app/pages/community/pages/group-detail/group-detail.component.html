@@ -1,0 +1,18 @@
+<div class="container community-page">
+  <div class="chat-layout">
+    <aside class="chat-sidebar glass">
+      <div class="group-header">
+        <h2>{{ group?.name }}</h2>
+        <p>{{ group?.description }}</p>
+      </div>
+      <div class="member-list">
+        <h3>Thành viên</h3>
+        <!-- Member list mock -->
+      </div>
+    </aside>
+
+    <main class="chat-main">
+      <app-chat-window [groupId]="groupId"></app-chat-window>
+    </main>
+  </div>
+</div>

@@ -1,0 +1,56 @@
+<div class="learning-lab-sandbox">
+  <div class="container">
+    <header class="sandbox-header">
+      <h1 class="grad-text">Phòng thực hành (Sandbox)</h1>
+      <p>Thực hành tự do, không giới hạn - Thử mọi cử chỉ bạn muốn!</p>
+    </header>
+
+    <div class="layout-grid">
+      <aside class="layout-grid__sidebar">
+        <div class="sandbox-info glass">
+          <h3>Chế độ thực hành</h3>
+          <p>Tất cả bài học đã được mở khóa để bạn có thể luyện tập bất cứ lúc nào.</p>
+        </div>
+        
+        <app-course-sidebar 
+          [courses]="courses()" 
+          [currentCourseId]="activeCourseId()"
+          [currentLessonId]="activeLessonId()"
+          (selectLesson)="onSelectLesson($any($event))">
+        </app-course-sidebar>
+      </aside>
+
+      <main class="layout-grid__content">
+        @if (selectedLesson()) {
+          <div class="practice-viewer">
+            <app-lesson-viewer 
+              [lesson]="selectedLesson()!"
+              [isLastLesson]="false">
+            </app-lesson-viewer>
+          </div>
+        } @else {
+          <div class="empty-selection glass">
+            <h2>Chọn chủ đề thực hành</h2>
+            <p>Khám phá kho kiến thức và bắt đầu luyện tập ngay.</p>
+          </div>
+        }
+
+        <div class="sandbox-tools">
+          <div class="tool-card glass animate-fade">
+            <div class="icon">📷</div>
+            <h4>Nhận diện Webcam</h4>
+            <p>Bật camera để AI kiểm tra cử chỉ của bạn (Sắp ra mắt)</p>
+            <button class="btn btn--primary" disabled>Coming Soon</button>
+          </div>
+          
+          <div class="tool-card glass animate-fade" style="animation-delay: 0.1s">
+            <div class="icon">📇</div>
+            <h4>Flashcards</h4>
+            <p>Học nhanh qua bộ thẻ ghi nhớ</p>
+            <button class="btn btn--ghost">Bắt đầu</button>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+</div>

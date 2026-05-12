@@ -1,108 +1,69 @@
 from django.contrib.auth import get_user_model, authenticate
-from django.contrib.auth.password_validation import (
-    validate_password as dj_validate_password,
-)
-from rest_framework import fields, serializers
+from django.contrib.auth.password_validation import validate_password as dj_validate_password
+from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
-from rest_framework.exceptions import AuthenticationFailed, ValidationError
-from typing import Any
+from rest_framework.exceptions import AuthenticationFailed
+from .service import UserService
 
 User = get_user_model()
 
-# RegisterSerializer start
 class RegisterSerializer(serializers.ModelSerializer):
     full_name = serializers.CharField(required=True, allow_blank=False, max_length=120)
-
     email = serializers.EmailField(
-        validators=[
-            UniqueValidator(queryset=User.objects.all(), message="Email already in use")
-        ]
+        validators=[UniqueValidator(queryset=User.objects.all(), message="Email already in use")]
     )
-
     password = serializers.CharField(write_only=True, trim_whitespace=False)
-    password2 = serializers.CharField(
-        write_only=True, trim_whitespace=False, label="Confirm password"
-    )
-
-    # nếu có field này trên model thì giữ; không thì xóa dòng này
-    date_of_birth = serializers.DateField(
-        required=False, allow_null=True, input_formats=["%Y-%m-%d"]
-    )
+    password_confirm = serializers.CharField(write_only=True, trim_whitespace=False)
 
     class Meta:
         model = User
-        fields = ("email", "password", "password2", "full_name", "date_of_birth")
+        fields = ("email", "password", "password_confirm", "full_name")
 
-    def validate_email(self, value: Any) -> Any:
-        return value.strip().lower()
-
-    def validate_password(self, value: str) -> str:
-        dj_validate_password(value)  # dùng alias để không đè tên method
+    def validate_password(self, value):
+        dj_validate_password(value)
         return value
 
-    def validate_full_name(self, value: str) -> str:
-        v = value.strip()
-        if not v:
-            raise serializers.ValidationError("Full name is required")
-        return " ".join(v.split())  # gộp khoảng trắng thừa (optional)
-
     def validate(self, attrs):
-        if attrs["password"] != attrs["password2"]:
+        if attrs["password"] != attrs["password_confirm"]:
             raise serializers.ValidationError({"password": ["Passwords do not match"]})
         return attrs
 
     def create(self, validated_data):
-        validated_data.pop("password2", None)
+        validated_data.pop("password_confirm")
+        return UserService.register_user(validated_data)
 
-        user = User(
-            email=validated_data["email"],
-            full_name=validated_data.get("full_name", ""),
-            date_of_birth=validated_data.get(
-                "date_of_birth"
-            ),  # xóa dòng này nếu model KHÔNG có field này
-        )
-
-        user.set_password(validated_data["password"])
-        user.save()
-        return user
-# RegisterSerializer end
-
-# Sign in Start
-class SignInSerializer(serializers.Serializer):  # KHÔNG dùng ModelSerializer cho login
-    email    = serializers.EmailField()
-    password = serializers.CharField(write_only=True, trim_whitespace=False)
+class SignInSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    password = serializers.CharField(write_only=True)
 
     def validate(self, attrs):
-        email = attrs.get("email", "").strip().lower()
-        password = attrs.get("password") or ""
-        if not email or not password:
-            raise ValidationError({"detail": "Email and password are required"})
-
-        # Nếu USERNAME_FIELD = "email" thì authenticate(username=email, password=...)
-        user = authenticate(username=email, password=password)
+        user = authenticate(username=attrs["email"], password=attrs["password"])
         if not user:
             raise AuthenticationFailed("Invalid credentials")
-
+        if not user.is_verified:
+            raise AuthenticationFailed("Account not verified. Please check your email.")
         attrs["user"] = user
         return attrs
-# signIn end
 
-# refresh pass start
-class RefreshSerializer(serializers.Serializer):
+class VerifyAccountSerializer(serializers.Serializer):
+    token = serializers.CharField()
+
+class ForgotPasswordSerializer(serializers.Serializer):
     email = serializers.EmailField()
-    phone = serializers.CharField()
 
-    def validate(self,attrs):
-        email = attrs.get("email", "").strip().lower()
+class ResetPasswordSerializer(serializers.Serializer):
+    token = serializers.CharField()
+    password = serializers.CharField(write_only=True)
+    password_confirm = serializers.CharField(write_only=True)
 
-        if not email:
-            raise ValidationError({"detail": "email is not availble"})
+    def validate_password(self, value):
+        dj_validate_password(value)
+        return value
 
-        user = authenticate(username=email)
-        if not user:
-            raise AuthenticationFailed("Invalid credentials")
-
-        attrs["user"] = user
+    def validate(self, attrs):
+        if attrs["password"] != attrs["password_confirm"]:
+            raise serializers.ValidationError({"password": ["Passwords do not match"]})
         return attrs
 
-
+class GoogleLoginSerializer(serializers.Serializer):
+    token = serializers.CharField()

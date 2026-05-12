@@ -1,0 +1,117 @@
+.quiz {
+  padding: 2.5rem;
+  border-radius: var(--radius);
+  max-width: 600px;
+  margin: 0 auto;
+
+  &__header {
+    margin-bottom: 2rem;
+    .step {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+    h3 {
+      font-size: 1.4rem;
+      line-height: 1.4;
+    }
+  }
+
+  &__options {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+  }
+
+  &__feedback {
+    margin-bottom: 2rem;
+    padding: 1rem;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.03);
+
+    p {
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      &.correct { color: var(--accent); }
+      &.wrong { color: #ff5252; }
+    }
+
+    .explanation {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      font-weight: 400;
+    }
+  }
+
+  &__footer {
+    display: flex;
+    justify-content: flex-end;
+  }
+}
+
+.option-btn {
+  padding: 1rem 1.5rem;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border);
+  color: var(--text);
+  text-align: left;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: var(--transition);
+
+  &:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.2);
+  }
+
+  &--selected {
+    background: rgba(var(--hue), 70%, 60%, 0.1);
+    border-color: var(--primary);
+  }
+
+  &--correct {
+    background: rgba(0, 255, 255, 0.1) !important;
+    border-color: var(--accent) !important;
+    color: var(--accent);
+  }
+
+  &--wrong {
+    background: rgba(255, 82, 82, 0.1) !important;
+    border-color: #ff5252 !important;
+    color: #ff5252;
+  }
+
+  &:disabled {
+    cursor: default;
+  }
+}
+
+.results {
+  text-align: center;
+  padding: 1rem 0;
+
+  &__icon {
+    font-size: 4rem;
+    margin-bottom: 1.5rem;
+  }
+
+  h2 {
+    margin-bottom: 0.5rem;
+  }
+
+  p {
+    color: var(--text-muted);
+    margin-bottom: 2rem;
+  }
+
+  &__actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+  }
+}

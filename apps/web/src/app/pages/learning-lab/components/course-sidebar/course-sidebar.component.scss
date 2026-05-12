@@ -1,0 +1,118 @@
+.sidebar {
+  height: calc(100vh - 120px);
+  overflow-y: auto;
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  position: sticky;
+  top: 100px;
+
+  &__header {
+    h2 {
+      font-size: 1.5rem;
+      margin-bottom: 0.25rem;
+    }
+    p {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+  }
+
+  &__content {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+}
+
+.course-item {
+  &--locked {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  &__info {
+    margin-bottom: 0.75rem;
+  }
+
+  &__title {
+    font-weight: 600;
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+}
+
+.progress-bar {
+  height: 6px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 0.25rem;
+
+  &__fill {
+    height: 100%;
+    background: var(--primary);
+    transition: width 0.5s ease;
+  }
+}
+
+.progress-text {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.lesson-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-left: 0.5rem;
+  padding-left: 0.5rem;
+  border-left: 1px solid var(--border);
+}
+
+.lesson-item {
+  padding: 0.6rem 0.8rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  transition: var(--transition);
+  color: var(--text-muted);
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.03);
+    color: var(--text);
+  }
+
+  &--active {
+    background: rgba(var(--hue), 70%, 60%, 0.1);
+    color: var(--primary-light);
+    font-weight: 500;
+
+    .dot {
+      background: var(--primary);
+      box-shadow: 0 0 10px var(--primary);
+    }
+  }
+
+  &--completed {
+    .check {
+      color: var(--accent);
+      margin-left: auto;
+    }
+  }
+
+  .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+  }
+}

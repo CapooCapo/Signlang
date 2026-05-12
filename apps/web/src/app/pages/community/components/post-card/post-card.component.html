@@ -1,0 +1,67 @@
+<div class="post-card animate-fade">
+  <!-- HEADER -->
+  <header class="post-header">
+    <div class="author-info">
+      <img [src]="post().author.avatar || 'assets/default-avatar.png'" [alt]="post().author.full_name" class="avatar">
+      <div class="meta">
+        <span class="name">{{ post().author.full_name }}</span>
+        <div class="sub">
+          <span class="role-badge" [attr.data-role]="post().author.role">{{ post().author.role }}</span>
+          <span class="dot">•</span>
+          <span class="time">{{ post().created_at | date:'shortTime' }}</span>
+        </div>
+      </div>
+    </div>
+    <button class="icon-btn">•••</button>
+  </header>
+
+  <!-- BODY -->
+  <div class="post-content">
+    <p class="text">{{ post().content }}</p>
+    
+    @if (post().image) {
+      <div class="media-container">
+        <img [src]="post().image" alt="Post content">
+      </div>
+    }
+
+    <!-- Course Promotion Special Section -->
+    @if (post().post_type === 'COURSE_PROMOTION') {
+      <div class="promotion-banner">
+        <h4>{{ post().title }}</h4>
+        <span class="price">{{ post().price | currency:'VND':'symbol':'1.0-0' }}</span>
+        <div class="promo-meta" *ngIf="post().center_name">
+          <p><strong>Cung cấp bởi:</strong> {{ post().center_name }}</p>
+          <p *ngIf="post().schedule"><strong>Lịch học:</strong> {{ post().schedule }}</p>
+        </div>
+        <button class="btn btn--primary" routerLink="/courses">
+          Xem chi tiết khóa học
+        </button>
+      </div>
+    }
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="post-footer">
+    <div class="reactions">
+      <button class="react-btn" [class.active]="post().user_reaction === 'LIKE'" (click)="toggleLike()">
+        <span class="icon">❤️</span>
+        <span>{{ post().reaction_counts['LIKE'] || 0 }}</span>
+      </button>
+      
+      <button class="react-btn" (click)="toggleComments()">
+        <span class="icon">💬</span>
+        <span>{{ post().comment_count }}</span>
+      </button>
+    </div>
+
+    <button class="share-btn" title="Chia sẻ">
+      <span>🔗</span>
+    </button>
+  </footer>
+
+  <!-- COMMENTS SECTION -->
+  @if (showComments) {
+    <app-comment-list [postId]="post().id"></app-comment-list>
+  }
+</div>

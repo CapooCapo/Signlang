@@ -1,0 +1,38 @@
+<div class="chat-drawer glass" [class.open]="chatService.isDrawerOpen()">
+  <header class="drawer-header">
+    <h3>Tin nhắn nhóm</h3>
+    <button class="close-btn" (click)="close()">✕</button>
+  </header>
+
+  <div class="drawer-content">
+    @if (!chatService.selectedGroupId()) {
+      <!-- List of Groups -->
+      <div class="groups-list">
+        @for (group of chatService.groups(); track group.id) {
+          <div class="group-item" (click)="selectGroup(group.id)">
+            <img [src]="group.image || 'assets/default-group.png'" class="avatar">
+            <div class="info">
+              <span class="name">{{ group.name }}</span>
+              <span class="members">{{ group.member_count }} thành viên</span>
+            </div>
+          </div>
+        } @empty {
+          <div class="empty-state">
+            <p>Bạn chưa tham gia nhóm nào.</p>
+            <a routerLink="/community/groups" (click)="close()">Tìm nhóm ngay</a>
+          </div>
+        }
+      </div>
+    } @else {
+      <!-- Active Chat -->
+      <div class="active-chat">
+        <button class="back-btn" (click)="chatService.selectedGroupId.set(null)">
+          ← Quay lại
+        </button>
+        <app-chat-window [groupId]="chatService.selectedGroupId()!"></app-chat-window>
+      </div>
+    }
+  </div>
+</div>
+
+<div class="drawer-overlay" *ngIf="chatService.isDrawerOpen()" (click)="close()"></div>

@@ -1,0 +1,61 @@
+<header class="nav" [class.nav--scrolled]="scrolled" role="banner">
+  <div class="container nav-container">
+    <!-- LEFT: Logo -->
+    <div class="nav-left">
+      <a class="brand" routerLink="/">
+        <img src="assets/images/logo.png" alt="SignLang" loading="eager" />
+        <span>SignLang</span>
+      </a>
+    </div>
+
+    <!-- CENTER: Search & Links -->
+    <div class="nav-center">
+      <div class="search-wrapper glass">
+        <span class="icon">🔍</span>
+        <input type="text" placeholder="Tìm kiếm khóa học, nhóm...">
+      </div>
+
+      <nav class="links" aria-label="Primary navigation">
+        <a routerLink="/" fragment="features" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Home</a>
+        <a routerLink="/community" routerLinkActive="active">Cộng đồng</a>
+        <a routerLink="/learning-lab" routerLinkActive="active">Lab</a>
+        <a routerLink="/courses" routerLinkActive="active">Khóa học</a>
+      </nav>
+    </div>
+
+    <!-- RIGHT: Actions -->
+    <div class="nav-right">
+      <div class="actions">
+        <app-notification-bell *ngIf="authService.isAuthenticated"></app-notification-bell>
+        
+        <button class="icon-btn glass" *ngIf="authService.isAuthenticated" (click)="chatService.toggleDrawer()">
+          <span>💬</span>
+        </button>
+        
+        <ng-container *ngIf="!authService.isAuthenticated">
+          <a class="btn btn--primary" routerLink="/login">Đăng nhập</a>
+        </ng-container>
+
+        <ng-container *ngIf="authService.isAuthenticated">
+          <div class="profile-dropdown">
+            <button class="profile-trigger" (click)="showProfileMenu = !showProfileMenu">
+              <img [src]="authService.currentUser()?.avatar || 'assets/default-avatar.png'" class="avatar">
+            </button>
+            
+            <div class="dropdown-menu glass animate-fade" *ngIf="showProfileMenu">
+              <div class="user-header">
+                <span class="name">{{ authService.currentUser()?.full_name }}</span>
+                <span class="email">{{ authService.currentUser()?.email }}</span>
+              </div>
+              <hr>
+              <a routerLink="/profile" (click)="showProfileMenu = false">Trang cá nhân</a>
+              <a routerLink="/settings" (click)="showProfileMenu = false">Cài đặt</a>
+              <hr>
+              <button (click)="logout(); showProfileMenu = false" class="logout-btn">Đăng xuất</button>
+            </div>
+          </div>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+</header>

@@ -1,0 +1,31 @@
+@if (progress) {
+  <div class="tracker glass">
+    <div class="stat">
+      <div class="stat__icon">⚡</div>
+      <div class="stat__info">
+        <span class="label">Total XP</span>
+        <span class="value">{{ progress.xp }}</span>
+      </div>
+    </div>
+
+    <div class="stat">
+      <div class="stat__icon">🔥</div>
+      <div class="stat__info">
+        <span class="label">Day Streak</span>
+        <span class="value">{{ progress.streak }}</span>
+      </div>
+    </div>
+
+    <div class="stat">
+      <div class="stat__icon">🎓</div>
+      <div class="stat__info">
+        <span class="label">Certificates</span>
+        <span class="value">{{ progress.unlockedCourseIds.length - 1 }}</span>
+      </div>
+    </div>
+    
+    <div class="continue-btn">
+      <button class="btn btn--primary btn--sm">Daily Challenge</button>
+    </div>
+  </div>
+}

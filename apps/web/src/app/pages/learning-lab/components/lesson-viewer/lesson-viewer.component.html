@@ -1,0 +1,71 @@
+<div class="viewer">
+  @if (lesson()) {
+    <div class="viewer__header">
+      @if (lesson().isCompleted) {
+        <div class="badge">Completed</div>
+      }
+      <h1>{{ lesson().title }}</h1>
+    </div>
+
+    <div class="viewer__content glass">
+      <div class="content-text">
+        {{ lesson().content }}
+      </div>
+
+      <!-- Signs Grid -->
+      @if (lesson().signs && lesson().signs!.length > 0) {
+        <div class="signs-section">
+          <h3>Key Signs</h3>
+          <div class="signs-grid">
+            @for (sign of lesson().signs; track sign.label) {
+              <app-sign-card [sign]="sign"></app-sign-card>
+            }
+          </div>
+        </div>
+      }
+
+      <!-- Alphabet Grid for Course 2 -->
+      @if (lesson().id === 'c2-l1') {
+        <div class="special-section">
+          <app-alphabet-grid></app-alphabet-grid>
+        </div>
+      }
+
+      <!-- Practice Section -->
+      @if (lesson().practice) {
+        <div class="practice-section">
+          <div class="practice-card glass">
+            <span class="type-badge">{{ lesson().practice!.type }}</span>
+            <h3>{{ lesson().practice!.title }}</h3>
+            <p>{{ lesson().practice!.content }}</p>
+            <button class="btn btn--ghost" (click)="onComplete()">Start Practice</button>
+          </div>
+        </div>
+      }
+
+      <!-- Quiz Section -->
+      @if (lesson().quiz) {
+        <div class="quiz-section">
+          <app-quiz [quiz]="lesson().quiz!" (completed)="onComplete()"></app-quiz>
+        </div>
+      }
+    </div>
+
+    <div class="viewer__footer">
+      @if (!lesson().isCompleted && !lesson().quiz && !lesson().practice) {
+        <button class="btn btn--ghost" (click)="onComplete()">
+          Mark as Completed
+        </button>
+      }
+      <button class="btn btn--primary" (click)="onNext()">
+        {{ isLastLesson() ? 'Finish Course' : 'Next Lesson' }} →
+      </button>
+    </div>
+  } @else {
+    <div class="empty-state glass">
+      <img src="https://via.placeholder.com/300x200?text=Select+a+Lesson" alt="No lesson selected">
+      <h2>Start Your Journey</h2>
+      <p>Select a lesson from the sidebar to begin learning sign language.</p>
+    </div>
+  }
+</div>

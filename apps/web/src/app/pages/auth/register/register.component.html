@@ -1,0 +1,97 @@
+<div class="login-container">
+  <div class="login-card">
+    <div class="login-header">
+      <img src="/logo.png" alt="SignLang Logo" class="logo" />
+      <h1>Tạo tài khoản mới</h1>
+      <p>Tham gia cộng đồng SignLang để bắt đầu học ngôn ngữ ký hiệu</p>
+    </div>
+
+    <div *ngIf="successMessage" class="success-alert">
+      <span class="icon">✅</span>
+      <p>{{ successMessage }}</p>
+      <button class="btn-link" routerLink="/login">Quay lại đăng nhập</button>
+    </div>
+
+    <form *ngIf="!successMessage" [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="login-form">
+      <div class="form-group">
+        <label for="full_name">Họ và tên</label>
+        <div class="input-wrapper" [class.error]="submitted && f['full_name'].invalid">
+          <span class="icon">👤</span>
+          <input
+            id="full_name"
+            type="text"
+            formControlName="full_name"
+            placeholder="Nguyễn Văn A"
+          />
+        </div>
+        <div *ngIf="submitted && f['full_name'].errors" class="error-message">
+          <small *ngIf="f['full_name'].errors['required']">Vui lòng nhập họ tên.</small>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email</label>
+        <div class="input-wrapper" [class.error]="submitted && f['email'].invalid">
+          <span class="icon">📧</span>
+          <input
+            id="email"
+            type="email"
+            formControlName="email"
+            placeholder="example@email.com"
+          />
+        </div>
+        <div *ngIf="submitted && f['email'].errors" class="error-message">
+          <small *ngIf="f['email'].errors['required']">Vui lòng nhập email.</small>
+          <small *ngIf="f['email'].errors['email']">Email không đúng định dạng.</small>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="password">Mật khẩu</label>
+        <div class="input-wrapper" [class.error]="submitted && f['password'].invalid">
+          <span class="icon">🔒</span>
+          <input
+            id="password"
+            type="password"
+            formControlName="password"
+            placeholder="••••••••"
+          />
+        </div>
+        <div *ngIf="submitted && f['password'].errors" class="error-message">
+          <small *ngIf="f['password'].errors['required']">Vui lòng nhập mật khẩu.</small>
+          <small *ngIf="f['password'].errors['minlength']">Mật khẩu phải có ít nhất 8 ký tự.</small>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="password_confirm">Xác nhận mật khẩu</label>
+        <div class="input-wrapper" [class.error]="submitted && (f['password_confirm'].invalid || registerForm.errors?.['mismatch'])">
+          <span class="icon">🛡️</span>
+          <input
+            id="password_confirm"
+            type="password"
+            formControlName="password_confirm"
+            placeholder="••••••••"
+          />
+        </div>
+        <div *ngIf="submitted && (f['password_confirm'].errors || registerForm.errors?.['mismatch'])" class="error-message">
+          <small *ngIf="f['password_confirm'].errors?.['required']">Vui lòng xác nhận mật khẩu.</small>
+          <small *ngIf="registerForm.errors?.['mismatch']">Mật khẩu không khớp.</small>
+        </div>
+      </div>
+
+      <div *ngIf="errorMessage" class="server-error">
+        {{ errorMessage }}
+      </div>
+
+      <button type="submit" class="btn-submit" [disabled]="loading">
+        <span *ngIf="!loading">Đăng ký</span>
+        <span *ngIf="loading" class="loader"></span>
+      </button>
+
+      <div class="login-footer">
+        <p>Đã có tài khoản? <a routerLink="/login">Đăng nhập</a></p>
+      </div>
+    </form>
+  </div>
+</div>

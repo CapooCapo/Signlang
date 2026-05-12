@@ -1,0 +1,49 @@
+<div class="sidebar glass">
+  <div class="sidebar__header">
+    <h2 class="grad-text">Learning Path</h2>
+    <p>Unlock your potential</p>
+  </div>
+
+  <div class="sidebar__content">
+    @for (course of courses(); track course.id) {
+      <div class="course-item" [class.course-item--locked]="course.isLocked">
+        <div class="course-item__info" (click)="onCourseHeaderClick(course)">
+          <div class="course-item__title">
+            @if (course.isLocked) {
+              <span class="icon">🔒</span>
+            } @else {
+              <span class="icon">📖</span>
+            }
+            {{ course.title }}
+          </div>
+          
+          @if (!course.isLocked) {
+            <div class="progress-bar">
+              <div class="progress-bar__fill" [style.width.%]="course.progress"></div>
+            </div>
+            <span class="progress-text">{{ course.progress }}%</span>
+          }
+        </div>
+
+        @if (!course.isLocked) {
+          <ul class="lesson-list">
+            @for (lesson of course.lessons; track lesson.id) {
+              <li class="lesson-item" 
+                  [class.lesson-item--active]="isLessonActive(lesson.id)"
+                  [class.lesson-item--completed]="lesson.isCompleted"
+                  (click)="onLessonClick(course.id, lesson.id, course.isLocked)">
+                <div class="lesson-item__status">
+                  <span class="dot"></span>
+                </div>
+                <span class="lesson-item__title">{{ lesson.title }}</span>
+                @if (lesson.isCompleted) {
+                  <span class="check">✓</span>
+                }
+              </li>
+            }
+          </ul>
+        }
+      </div>
+    }
+  </div>
+</div>

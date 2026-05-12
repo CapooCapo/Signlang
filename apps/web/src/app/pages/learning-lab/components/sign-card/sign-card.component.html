@@ -1,0 +1,15 @@
+<div class="sign-card glass-hover">
+  <div class="sign-card__media">
+    <div class="placeholder-icon">{{ sign.label[0] }}</div>
+    <div class="difficulty-tag" [attr.data-level]="sign.difficulty">{{ sign.difficulty || 'Beginner' }}</div>
+  </div>
+  <div class="sign-card__info">
+    <h4>{{ sign.label }}</h4>
+    <p class="description">{{ sign.description }}</p>
+    @if (sign.usageExample) {
+      <div class="usage">
+        <strong>Example:</strong> {{ sign.usageExample }}
+      </div>
+    }
+  </div>
+</div>
