@@ -12,3 +12,4 @@ requests==2.32.3
 django-stubs
 firebase-admin
 PyJWT==2.10.1
+Pillow==10.4.0

@@ -7,14 +7,14 @@ import { RegisterComponent } from './register/register.component';
 import { VerifyComponent } from './verify/verify.component';
 import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
 import { ResetPasswordComponent } from './reset-password/reset-password.component';
-import { GuestGuard } from '../../core/guards/guest.guard';
+import { guestGuard } from '../../core/guards/guest.guard';
 
 const routes: Routes = [
-  { path: 'login', component: LoginComponent, canActivate: [GuestGuard] },
-  { path: 'register', component: RegisterComponent, canActivate: [GuestGuard] },
-  { path: 'verify', component: VerifyComponent, canActivate: [GuestGuard] },
-  { path: 'forgot-password', component: ForgotPasswordComponent, canActivate: [GuestGuard] },
-  { path: 'reset-password', component: ResetPasswordComponent, canActivate: [GuestGuard] },
+  { path: 'login', component: LoginComponent, canActivate: [guestGuard] },
+  { path: 'register', component: RegisterComponent, canActivate: [guestGuard] },
+  { path: 'verify', component: VerifyComponent, canActivate: [guestGuard] },
+  { path: 'forgot-password', component: ForgotPasswordComponent, canActivate: [guestGuard] },
+  { path: 'reset-password', component: ResetPasswordComponent, canActivate: [guestGuard] },
 ];
 
 @NgModule({

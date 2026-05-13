@@ -3,7 +3,7 @@ from .models import (
     CommunityPost, PostComment, PostReaction,
     GroupChat, GroupMember, GroupMessage, Notification
 )
-from users.models import User
+from accounts.models import User
 
 class UserMinimalSerializer(serializers.ModelSerializer):
     class Meta:

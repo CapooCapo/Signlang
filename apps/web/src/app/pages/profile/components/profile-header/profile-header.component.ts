@@ -12,6 +12,7 @@ export class ProfileHeaderComponent {
   isOwnProfile = input<boolean>(false);
   edit = output<void>();
   share = output<void>();
+  upload = output<{ file: File, field: 'avatar' | 'cover_image' }>();
 
   onEdit() {
     this.edit.emit();
@@ -19,5 +20,12 @@ export class ProfileHeaderComponent {
 
   onShare() {
     this.share.emit();
+  }
+
+  onFileSelected(event: any, field: 'avatar' | 'cover_image') {
+    const file = event.target.files?.[0];
+    if (file) {
+      this.upload.emit({ file, field });
+    }
   }
 }

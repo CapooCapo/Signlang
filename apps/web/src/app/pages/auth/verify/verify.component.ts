@@ -93,12 +93,12 @@ export class VerifyComponent implements OnInit {
     }
 
     this.authService.verifyAccount(token).subscribe({
-      next: (res) => {
+      next: (res: any) => {
         this.loading = false;
         this.success = true;
         this.message = res.message;
       },
-      error: (err) => {
+      error: (err: any) => {
         this.loading = false;
         this.success = false;
         this.message = err.error?.message || 'Không thể xác minh tài khoản.';

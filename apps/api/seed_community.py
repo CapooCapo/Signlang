@@ -7,17 +7,17 @@ from django.utils import timezone
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend.settings')
 django.setup()
 
-from users.models import User
+from accounts.models import User
 from community.models import CommunityPost, GroupChat, GroupMember, GroupMessage, PostComment, PostReaction
 
 def seed_data():
     print("Seeding mock data...")
     
-    # 1. Ensure we have users
+    # 1. Ensure we have accounts
     passwords = ['pass123', 'securePass!', 'admin123']
     roles = [User.Roles.USER, User.Roles.LECTURER, User.Roles.CENTER]
     
-    users = []
+    accounts = []
     for i in range(10):
         email = f'user{i}@example.com'
         user, created = User.objects.get_or_create(
@@ -32,7 +32,7 @@ def seed_data():
         if created:
             user.set_password('pass123')
             user.save()
-        users.append(user)
+        accounts.append(user)
 
     # 2. Create Groups
     group_names = ['Beginner Sign Language', 'Deaf Community Vietnam', 'ASL Practice', 'Daily Conversation', 'Jobs for Deaf']
@@ -42,18 +42,18 @@ def seed_data():
             name=name,
             defaults={
                 'description': f'Welcome to {name}! A place to learn and share.',
-                'created_by': users[0]
+                'created_by': accounts[0]
             }
         )
         groups.append(group)
         # Add members
-        for user in users:
+        for user in accounts:
             GroupMember.objects.get_or_create(group=group, user=user)
 
     # 3. Create Posts
     post_types = CommunityPost.PostType.choices
     for i in range(20):
-        author = random.choice(users)
+        author = random.choice(accounts)
         p_type = random.choice([t[0] for t in post_types])
         
         post = CommunityPost.objects.create(
@@ -71,15 +71,15 @@ def seed_data():
         for j in range(random.randint(0, 5)):
             PostComment.objects.create(
                 post=post,
-                author=random.choice(users),
+                author=random.choice(accounts),
                 content=f"Cool post! Comment {j}"
             )
             
         # Add some reactions
-        for user in random.sample(users, random.randint(0, 5)):
+        for user in random.sample(accounts, random.randint(0, 5)):
             PostReaction.objects.get_or_create(post=post, user=user, reaction_type='LIKE')
 
-    print("Successfully seeded 20 posts, 5 groups, and 10 users.")
+    print("Successfully seeded 20 posts, 5 groups, and 10 accounts.")
 
 if __name__ == "__main__":
     seed_data()

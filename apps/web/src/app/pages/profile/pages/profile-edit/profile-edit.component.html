@@ -1,0 +1,74 @@
+<div class="edit-container animate-fade">
+  <div class="edit-card glass">
+    <div class="edit-header">
+      <h2>Chỉnh sửa trang cá nhân</h2>
+      <p>Cập nhật thông tin công khai của bạn</p>
+    </div>
+
+    @if (isLoading()) {
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <p>Đang tải thông tin...</p>
+      </div>
+    } @else {
+      <form [formGroup]="profileForm" (ngSubmit)="onSubmit()" class="edit-form">
+        <!-- Media Section -->
+        <div class="media-previews">
+          <!-- Cover Image Preview -->
+          <div class="cover-preview-container">
+            <img [src]="coverPreview() || 'https://placehold.co/800x200/1e293b/ffffff?text=Cover+Image'" alt="Cover Preview" class="cover-preview">
+            <button type="button" class="btn-change-image" (click)="coverInput.click()">
+              📷 Thay đổi ảnh bìa
+            </button>
+            <input #coverInput type="file" (change)="onFileSelected($event, 'cover_image')" hidden accept="image/*">
+          </div>
+
+          <!-- Avatar Preview -->
+          <div class="avatar-preview-container">
+            <div class="avatar-wrapper">
+              <img [src]="avatarPreview() || 'https://placehold.co/150x150/3b82f6/ffffff?text=Avatar'" alt="Avatar Preview" class="avatar-preview">
+              <button type="button" class="btn-change-avatar" (click)="avatarInput.click()">📷</button>
+            </div>
+            <input #avatarInput type="file" (change)="onFileSelected($event, 'avatar')" hidden accept="image/*">
+          </div>
+        </div>
+
+        <!-- Form Fields -->
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="full_name">Họ và tên</label>
+            <input id="full_name" type="text" formControlName="full_name" placeholder="Nhập họ tên của bạn">
+          </div>
+
+          <div class="form-group">
+            <label for="city">Thành phố</label>
+            <input id="city" type="text" formControlName="city" placeholder="Ví dụ: Hà Nội, TP. HCM">
+          </div>
+
+          <div class="form-group full-width">
+            <label for="bio">Tiểu sử</label>
+            <textarea id="bio" formControlName="bio" rows="3" placeholder="Chia sẻ một chút về bản thân..."></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="website">Website</label>
+            <input id="website" type="url" formControlName="website" placeholder="https://yourwebsite.com">
+          </div>
+
+          <div class="form-group">
+            <label for="phone">Số điện thoại</label>
+            <input id="phone" type="tel" formControlName="phone" placeholder="Nhập số điện thoại">
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn btn--ghost" (click)="onCancel()" [disabled]="isSaving()">Hủy</button>
+          <button type="submit" class="btn btn--primary" [disabled]="profileForm.invalid || isSaving()">
+            <span *ngIf="!isSaving()">Lưu thay đổi</span>
+            <span *ngIf="isSaving()" class="loader"></span>
+          </button>
+        </div>
+      </form>
+    }
+  </div>
+</div>

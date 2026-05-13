@@ -2,12 +2,16 @@ from rest_framework import viewsets, permissions, status, decorators
 from rest_framework.response import Response
 from .models import Profile, PrivacySettings
 from .serializers import ProfileSerializer, PrivacySettingsSerializer, UserProfileSerializer
-from users.models import User
 from django.shortcuts import get_object_or_404
+from backend.common.responses import res_message
+from accounts.models import User
+
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 
 class ProfileViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = ProfileSerializer
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
 
     def get_queryset(self):
         return Profile.objects.filter(user=self.request.user)
@@ -15,19 +19,23 @@ class ProfileViewSet(viewsets.ModelViewSet):
     @decorators.action(detail=False, methods=['get', 'put', 'patch'])
     def me(self, request):
         profile = get_object_or_404(Profile, user=request.user)
-        if request.method == 'GET':
-            serializer = ProfileSerializer(profile)
-            return Response(serializer.data)
         
-        serializer = ProfileSerializer(profile, data=request.data, partial=True)
+        if request.method == 'GET':
+            serializer = ProfileSerializer(profile, context={'request': request})
+            return res_message(200, "Profile retrieved", serializer.data)
+        
+        serializer = ProfileSerializer(profile, data=request.data, partial=True, context={'request': request})
+        
+        print("REQUEST DATA:", request.data)
+        print("REQUEST FILES:", request.FILES)
+        print("AVATAR FILE:", request.FILES.get("avatar"))
+        
         if serializer.is_valid():
             serializer.save()
-            # Also update full_name if provided in request.data for the user
-            if 'full_name' in request.data:
-                request.user.full_name = request.data['full_name']
-                request.user.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return res_message(200, "Profile updated", serializer.data)
+            
+        print("SERIALIZER ERRORS:", serializer.errors)
+        return res_message(400, "Invalid data", serializer.errors)
 
     @decorators.action(detail=False, methods=['get'], url_path='u/(?P<username>[^/.]+)')
     def by_username(self, request, username=None):
@@ -38,9 +46,9 @@ class ProfileViewSet(viewsets.ModelViewSet):
         # Check privacy settings
         privacy = user.privacy_settings
         if privacy.profile_visibility == 'PRIVATE' and user != request.user:
-            return Response({'detail': 'This profile is private.'}, status=status.HTTP_403_FORBIDDEN)
+            return res_message(403, "This profile is private.")
             
-        serializer = UserProfileSerializer(user)
+        serializer = UserProfileSerializer(user, context={'request': request})
         data = serializer.data
         
         # Filter data based on privacy
@@ -48,7 +56,7 @@ class ProfileViewSet(viewsets.ModelViewSet):
             if not privacy.show_activity: data.pop('activity', None) # We'll add activity logic later
             if not privacy.show_groups: data.pop('groups', None)
             
-        return Response(data)
+        return res_message(200, "Profile retrieved", data)
 
 class PrivacySettingsViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
@@ -62,10 +70,10 @@ class PrivacySettingsViewSet(viewsets.ModelViewSet):
         settings = get_object_or_404(PrivacySettings, user=request.user)
         if request.method == 'GET':
             serializer = PrivacySettingsSerializer(settings)
-            return Response(serializer.data)
+            return res_message(200, "Privacy settings retrieved", serializer.data)
         
         serializer = PrivacySettingsSerializer(settings, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return res_message(200, "Privacy settings updated", serializer.data)
+        return res_message(400, "Invalid data", serializer.errors)

@@ -28,6 +28,11 @@ export class ApiService {
       .pipe(catchError(this.formatErrors));
   }
 
+  patch<T>(path: string, body: any = {}): Observable<T> {
+    return this.http.patch<T>(`${this.API_URL}${path}`, body)
+      .pipe(catchError(this.formatErrors));
+  }
+
   delete<T>(path: string): Observable<T> {
     return this.http.delete<T>(`${this.API_URL}${path}`)
       .pipe(catchError(this.formatErrors));

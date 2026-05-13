@@ -4,6 +4,8 @@ import { HttpClientModule } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
+import { APP_INITIALIZER } from '@angular/core';
+import { AuthService } from './core/services/auth.service';
 import { CoreModule } from './core/core.module';
 import { SharedModule } from './shared/shared.module';
 import { environment } from '../environments/environment';
@@ -31,6 +33,12 @@ import { provideAuth, getAuth } from '@angular/fire/auth';
   providers: [
     provideFirebaseApp(() => initializeApp(environment.firebase)),
     provideAuth(() => getAuth()),
+    {
+      provide: APP_INITIALIZER,
+      useFactory: (authService: AuthService) => () => authService.initializeAuth(),
+      deps: [AuthService],
+      multi: true
+    }
   ],
   bootstrap: [AppComponent]
 })

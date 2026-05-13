@@ -51,7 +51,7 @@ export class RegisterComponent implements OnInit {
 
     this.loading = true;
     this.authService.register(this.registerForm.value).subscribe({
-      next: (res) => {
+      next: (res: any) => {
         this.loading = false;
         this.successMessage = res.message;
         // Optionally redirect after some time

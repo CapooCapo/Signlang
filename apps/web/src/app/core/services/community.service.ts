@@ -1,17 +1,17 @@
 import { Injectable, inject, signal } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { environment } from '../../../environments/environment';
 import { CommunityPost, PostComment, Notification } from '../models/community.model';
 import { WebsocketService } from './websocket.service';
-import { filter } from 'rxjs';
+import { filter, map, tap } from 'rxjs';
+import { ApiService } from './api.service';
+import { ApiResponse } from '../models/api-response.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CommunityService {
-  private http = inject(HttpClient);
+  private apiService = inject(ApiService);
   private wsService = inject(WebsocketService);
-  private apiUrl = `${environment.apiUrl}/community`;
+  private readonly baseUrl = '/community';
 
   // Signals for State Management
   posts = signal<CommunityPost[]>([]);
@@ -43,37 +43,50 @@ export class CommunityService {
   }
 
   getPosts() {
-    return this.http.get<CommunityPost[]>(`${this.apiUrl}/posts/`).subscribe(data => {
-      this.posts.set(data);
-    });
+    return this.apiService.get<ApiResponse<CommunityPost[]>>(`${this.baseUrl}/posts/`).pipe(
+      map(res => res.object),
+      tap(data => this.posts.set(data))
+    ).subscribe();
   }
 
-  createPost(data: any) {
-    return this.http.post<CommunityPost>(`${this.apiUrl}/posts/`, data);
+  createPost(data: { content: string; post_type: string }) {
+    return this.apiService.post<ApiResponse<CommunityPost>>(`${this.baseUrl}/posts/`, data).pipe(
+      map(res => res.object)
+    );
   }
 
   getComments(postId: string) {
-    return this.http.get<PostComment[]>(`${this.apiUrl}/posts/${postId}/comments/`);
+    return this.apiService.get<ApiResponse<PostComment[]>>(`${this.baseUrl}/posts/${postId}/comments/`).pipe(
+      map(res => res.object)
+    );
   }
 
   addComment(postId: string, content: string) {
-    return this.http.post<PostComment>(`${this.apiUrl}/posts/${postId}/comment/`, { content });
+    return this.apiService.post<ApiResponse<PostComment>>(`${this.baseUrl}/posts/${postId}/comment/`, { content }).pipe(
+      map(res => res.object)
+    );
   }
 
   react(postId: string, type: string) {
-    return this.http.post(`${this.apiUrl}/posts/${postId}/react/`, { type });
+    return this.apiService.post<ApiResponse<any>>(`${this.baseUrl}/posts/${postId}/react/`, { type }).pipe(
+      map(res => res.object)
+    );
   }
 
   getNotifications() {
-    return this.http.get<Notification[]>(`${this.apiUrl}/notifications/`).subscribe(data => {
-      this.notifications.set(data);
-      this.unreadNotifCount.set(data.filter(n => !n.is_read).length);
-    });
+    return this.apiService.get<ApiResponse<Notification[]>>(`${this.baseUrl}/notifications/`).pipe(
+      map(res => res.object),
+      tap(data => {
+        this.notifications.set(data);
+        this.unreadNotifCount.set(data.filter(n => !n.is_read).length);
+      })
+    ).subscribe();
   }
 
   markAllRead() {
-    return this.http.post(`${this.apiUrl}/notifications/mark_all_read/`, {}).subscribe(() => {
-      this.unreadNotifCount.set(0);
-    });
+    return this.apiService.post<ApiResponse<any>>(`${this.baseUrl}/notifications/mark_all_read/`, {}).pipe(
+      map(res => res.object),
+      tap(() => this.unreadNotifCount.set(0))
+    ).subscribe();
   }
 }

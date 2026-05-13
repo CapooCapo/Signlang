@@ -1,17 +1,18 @@
 import { Injectable, inject, signal } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 import { GroupChat, GroupMessage } from '../models/community.model';
 import { WebsocketService } from './websocket.service';
-import { filter } from 'rxjs';
+import { filter, map, tap } from 'rxjs';
+import { ApiService } from './api.service';
+import { ApiResponse } from '../models/api-response.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ChatService {
-  private http = inject(HttpClient);
+  private apiService = inject(ApiService);
   private wsService = inject(WebsocketService);
-  private apiUrl = `${environment.apiUrl}/community/groups`;
+  private readonly baseUrl = '/community/groups';
 
   groups = signal<GroupChat[]>([]);
   activeMessages = signal<GroupMessage[]>([]);
@@ -23,39 +24,47 @@ export class ChatService {
   toggleDrawer() {
     this.isDrawerOpen.update(v => !v);
     if (this.isDrawerOpen() && this.groups().length === 0) {
-      this.getGroups();
+      this.getGroups().subscribe();
     }
   }
 
   openChat(groupId: string) {
     this.selectedGroupId.set(groupId);
     this.isDrawerOpen.set(true);
-    this.getMessages(groupId);
+    this.getMessages(groupId).subscribe();
     this.connectToChat(groupId);
   }
 
   getGroups() {
-    return this.http.get<GroupChat[]>(`${this.apiUrl}/`).subscribe(data => {
-      this.groups.set(data);
-    });
+    return this.apiService.get<ApiResponse<GroupChat[]>>(`${this.baseUrl}/`).pipe(
+      map(res => res.object),
+      tap(data => this.groups.set(data))
+    );
   }
 
   joinGroup(groupId: string) {
-    return this.http.post(`${this.apiUrl}/${groupId}/join/`, {});
+    return this.apiService.post<ApiResponse<any>>(`${this.baseUrl}/${groupId}/join/`, {}).pipe(
+      map(res => res.object)
+    );
   }
 
   leaveGroup(groupId: string) {
-    return this.http.post(`${this.apiUrl}/${groupId}/leave/`, {});
+    return this.apiService.post<ApiResponse<any>>(`${this.baseUrl}/${groupId}/leave/`, {}).pipe(
+      map(res => res.object)
+    );
   }
 
   getMessages(groupId: string) {
-    return this.http.get<GroupMessage[]>(`${this.apiUrl}/${groupId}/messages/`).subscribe(data => {
-      this.activeMessages.set(data);
-    });
+    return this.apiService.get<ApiResponse<GroupMessage[]>>(`${this.baseUrl}/${groupId}/messages/`).pipe(
+      map(res => res.object),
+      tap(data => this.activeMessages.set(data))
+    );
   }
 
   sendMessage(groupId: string, content: string, image?: string) {
-    return this.http.post<GroupMessage>(`${this.apiUrl}/${groupId}/messages/`, { content, image });
+    return this.apiService.post<ApiResponse<GroupMessage>>(`${this.baseUrl}/${groupId}/messages/`, { content, image }).pipe(
+      map(res => res.object)
+    );
   }
 
   connectToChat(groupId: string) {

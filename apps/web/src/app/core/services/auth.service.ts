@@ -1,94 +1,83 @@
-import { Injectable, signal } from '@angular/core';
-import { BehaviorSubject, Observable, from, switchMap, tap, catchError, of } from 'rxjs';
+import { Injectable, signal, inject, computed } from '@angular/core';
+import { BehaviorSubject, Observable, from, switchMap, tap, catchError, of, map, finalize } from 'rxjs';
 import { Router } from '@angular/router';
 import { ApiService } from './api.service';
 import { Auth, signInWithPopup, GoogleAuthProvider, authState, UserCredential } from '@angular/fire/auth';
-import { inject } from '@angular/core';
+import { User, AuthData } from '../models/user.model';
+import { ApiResponse } from '../models/api-response.model';
 
-export interface User {
-  id: number;
-  email: string;
-  full_name: string;
-  role: string;
-  avatar: string;
-  provider: string;
-}
-
-export interface AuthData {
-  access: string;
-  refresh: string;
-  user: User;
-}
-
-export interface AuthResponse {
-  status: number;
-  message: string;
-  object: AuthData;
-}
-
-export interface LoginRequest {
-  email: string;
-  password: string;
-}
-
-export interface RegisterRequest {
-  email: string;
-  password: string;
-  full_name: string;
-}
-
-export interface ResetPasswordRequest {
-  token: string;
-  password: string;
-}
+export type AuthResponse = ApiResponse<AuthData>;
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
+  // Centralized state using BehaviorSubjects
   private currentUserSubject = new BehaviorSubject<User | null>(null);
-  public currentUser$ = this.currentUserSubject.asObservable();
+  private isAuthenticatedSubject = new BehaviorSubject<boolean>(false);
+  private accessTokenSignal = signal<string | null>(null);
   
-  accessToken = signal<string | null>(null);
-  currentUser = signal<User | null>(null);
+  // Public observable streams
+  public currentUser$ = this.currentUserSubject.asObservable();
+  public isAuthenticated$ = this.isAuthenticatedSubject.asObservable();
+  
+  // Signals for template convenience
+  public currentUser = signal<User | null>(null);
+  public isAuthReady = signal<boolean>(false);
+  public accessToken = computed(() => this.accessTokenSignal());
 
   private auth: Auth = inject(Auth);
+  private apiService = inject(ApiService);
+  private router = inject(Router);
   
-  constructor(
-    private apiService: ApiService, 
-    private router: Router
-  ) {
+  constructor() {
+    // Initial load from storage to prevent flickering
     this.loadUserFromStorage();
-    this.monitorAuthState();
-    if (this.isAuthenticated) {
-      this.loadMe().subscribe();
+    this.monitorFirebaseState();
+  }
+
+  /**
+   * Explicit bootstrap lifecycle called by APP_INITIALIZER.
+   * Ensures the auth state is fully resolved before the app renders.
+   */
+  initializeAuth(): Observable<void> {
+    if (!this.getAccessToken()) {
+      this.isAuthReady.set(true);
+      return of(undefined);
     }
+
+    return this.loadMe().pipe(
+      map(() => undefined),
+      catchError(() => of(undefined)),
+      finalize(() => this.isAuthReady.set(true))
+    );
   }
 
   loadMe(): Observable<User> {
-    return this.apiService.get<User>('/auth/me/').pipe(
-      tap(user => {
-        this.currentUser.set(user);
-        this.currentUserSubject.next(user);
-        localStorage.setItem('user', JSON.stringify(user));
-      }),
+    return this.apiService.get<ApiResponse<User>>('/auth/me/').pipe(
+      map(response => response.object),
+      tap(user => this.updateState(user)),
       catchError(err => {
-        if (err.status === 401) this.clearStorage();
+        if (err.status === 401) {
+          this.clearStorage();
+        }
         throw err;
       })
     );
   }
 
-  private monitorAuthState() {
+  private monitorFirebaseState() {
     authState(this.auth).subscribe(user => {
-      console.log('Firebase Auth State:', user ? `Logged in as ${user.email}` : 'Logged out');
+      if (user) {
+        console.debug('[Auth] Firebase user detected:', user.email);
+      }
     });
   }
 
-  login(credentials: LoginRequest): Observable<AuthResponse> {
+  login(credentials: { email: string; password: string }): Observable<AuthResponse> {
     return this.apiService.post<AuthResponse>('/auth/login/', credentials).pipe(
       tap((response) => {
-        if (response.status === 200 && response.object) {
+        if (response.success && response.object) {
           this.handleAuthSuccess(response.object);
         }
       })
@@ -96,112 +85,96 @@ export class AuthService {
   }
 
   loginWithGoogle(): Observable<AuthResponse> {
-    console.log('Starting Google Login flow (Modular SDK)...');
     const provider = new GoogleAuthProvider();
     provider.addScope('email');
     provider.addScope('profile');
-    provider.setCustomParameters({ prompt: 'select_account' });
 
     return from(signInWithPopup(this.auth, provider)).pipe(
-      switchMap((result: UserCredential) => {
-        if (!result.user) {
-          console.error('CRITICAL: Firebase user is missing from login result.');
-          throw new Error('Không lấy được thông tin người dùng từ Firebase');
-        }
-
-        console.log('--- [DEBUG] Retrieving Firebase ID Token ---');
-        return from(result.user.getIdToken());
-      }),
-      tap(idToken => {
-        console.log('--- [DEBUG] Backend Request Payload ---');
-        console.log('Payload:', JSON.stringify({ token: idToken }, null, 2));
-        console.log('Sending token to backend endpoint: /auth/google/');
-      }),
-      switchMap(idToken => 
-        this.apiService.post<AuthResponse>('/auth/google/', { token: idToken })
-      ),
+      switchMap((result: UserCredential) => from(result.user.getIdToken())),
+      switchMap(idToken => this.apiService.post<AuthResponse>('/auth/google/', { token: idToken })),
       tap((response) => {
-        if (response.status === 200 && response.object) {
-          console.log('Backend authentication successful:', response.object);
+        if (response.success && response.object) {
           this.handleAuthSuccess(response.object);
-        } else {
-          console.error('Backend authentication failed. Status:', response.status, 'Message:', response.message);
         }
-      }),
-      catchError(err => {
-        console.error('--- [DEBUG] Google Login Error ---');
-        console.error('Error Details:', err);
-        throw err;
       })
     );
   }
 
-  register(data: RegisterRequest): Observable<any> {
-    return this.apiService.post<any>('/auth/register/', data);
+  register(data: any): Observable<ApiResponse<any>> {
+    return this.apiService.post<ApiResponse<any>>('/auth/register/', data);
   }
 
-  verifyAccount(token: string): Observable<any> {
-    return this.apiService.post('/auth/verify/', { token });
+  verifyAccount(token: string): Observable<ApiResponse<any>> {
+    return this.apiService.post<ApiResponse<any>>('/auth/verify/', { token });
   }
 
-  forgotPassword(email: string): Observable<any> {
-    return this.apiService.post('/auth/forgot-password/', { email });
+  forgotPassword(email: string): Observable<ApiResponse<any>> {
+    return this.apiService.post<ApiResponse<any>>('/auth/forgot-password/', { email });
   }
 
-  resetPassword(data: ResetPasswordRequest): Observable<any> {
-    return this.apiService.post<any>('/auth/reset-password/', data);
+  resetPassword(data: any): Observable<ApiResponse<any>> {
+    return this.apiService.post<ApiResponse<any>>('/auth/reset-password/', data);
   }
 
   logout() {
-    console.log('Logging out...');
-    from(this.auth.signOut()).subscribe(() => {
-      const refresh = localStorage.getItem('refresh_token');
-      if (refresh) {
-        this.apiService.post('/auth/logout/', { refresh }).subscribe({
-          next: () => this.clearStorage(),
-          error: () => this.clearStorage()
-        });
-      } else {
-        this.clearStorage();
-      }
-    });
-  }
+    const refresh = localStorage.getItem('refresh_token');
+    const finalLogout = () => {
+      this.clearStorage();
+      this.router.navigate(['/login']);
+    };
 
-  private clearStorage() {
-    localStorage.removeItem('access_token');
-    localStorage.removeItem('refresh_token');
-    localStorage.removeItem('user');
-    this.accessToken.set(null);
-    this.currentUser.set(null);
-    this.currentUserSubject.next(null);
-    this.router.navigate(['/login']);
-  }
-
-  get isAuthenticated(): boolean {
-    return !!localStorage.getItem('access_token');
+    if (refresh) {
+      this.apiService.post('/auth/logout/', { refresh }).pipe(
+        finalize(() => finalLogout())
+      ).subscribe();
+    } else {
+      finalLogout();
+    }
+    
+    from(this.auth.signOut()).subscribe();
   }
 
   private handleAuthSuccess(data: AuthData) {
     localStorage.setItem('access_token', data.access);
     localStorage.setItem('refresh_token', data.refresh);
     localStorage.setItem('user', JSON.stringify(data.user));
-    this.accessToken.set(data.access);
-    this.currentUser.set(data.user);
-    this.currentUserSubject.next(data.user);
+    this.accessTokenSignal.set(data.access);
+    this.updateState(data.user);
+  }
+
+  private updateState(user: User | null) {
+    this.currentUserSubject.next(user);
+    this.isAuthenticatedSubject.next(!!user);
+    this.currentUser.set(user);
   }
 
   private loadUserFromStorage() {
     const access = localStorage.getItem('access_token');
     const userJson = localStorage.getItem('user');
-    if (access) this.accessToken.set(access);
+    if (access) this.accessTokenSignal.set(access);
     if (userJson) {
       try {
         const user = JSON.parse(userJson);
-        this.currentUser.set(user);
-        this.currentUserSubject.next(user);
+        this.updateState(user);
       } catch (e) {
         this.clearStorage();
       }
     }
+  }
+
+  private clearStorage() {
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
+    localStorage.removeItem('user');
+    this.accessTokenSignal.set(null);
+    this.updateState(null);
+  }
+
+  public getAccessToken(): string | null {
+    return localStorage.getItem('access_token');
+  }
+
+  get isAuthenticated(): boolean {
+    return this.isAuthenticatedSubject.value;
   }
 }

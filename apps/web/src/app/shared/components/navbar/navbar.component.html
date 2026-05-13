@@ -32,28 +32,35 @@
           <span>💬</span>
         </button>
         
-        <ng-container *ngIf="!authService.isAuthenticated">
-          <a class="btn btn--primary" routerLink="/login">Đăng nhập</a>
+        <!-- Auth States -->
+        <ng-container *ngIf="!authService.isAuthReady()">
+          <div class="auth-loading glass"></div>
         </ng-container>
 
-        <ng-container *ngIf="authService.isAuthenticated">
-          <div class="profile-dropdown">
-            <button class="profile-trigger" (click)="showProfileMenu = !showProfileMenu">
-              <img [src]="authService.currentUser()?.avatar || 'assets/default-avatar.png'" class="avatar">
-            </button>
-            
-            <div class="dropdown-menu glass animate-fade" *ngIf="showProfileMenu">
-              <div class="user-header">
-                <span class="name">{{ authService.currentUser()?.full_name }}</span>
-                <span class="email">{{ authService.currentUser()?.email }}</span>
+        <ng-container *ngIf="authService.isAuthReady()">
+          <ng-container *ngIf="!(authService.isAuthenticated$ | async)">
+            <a class="btn btn--primary" routerLink="/login">Đăng nhập</a>
+          </ng-container>
+
+          <ng-container *ngIf="authService.isAuthenticated$ | async">
+            <div class="profile-dropdown">
+              <button class="profile-trigger" (click)="showProfileMenu = !showProfileMenu">
+                <img [src]="authService.currentUser()?.avatar || 'https://placehold.co/150x150/3b82f6/ffffff?text=Avatar'" class="avatar">
+              </button>
+              
+              <div class="dropdown-menu glass animate-fade" *ngIf="showProfileMenu">
+                <div class="user-header">
+                  <span class="name">{{ authService.currentUser()?.full_name || 'Đang tải...' }}</span>
+                  <span class="email">{{ authService.currentUser()?.email }}</span>
+                </div>
+                <hr>
+                <a routerLink="/profile" (click)="showProfileMenu = false">Trang cá nhân</a>
+                <a routerLink="/settings" (click)="showProfileMenu = false">Cài đặt</a>
+                <hr>
+                <button (click)="logout(); showProfileMenu = false" class="logout-btn">Đăng xuất</button>
               </div>
-              <hr>
-              <a routerLink="/profile" (click)="showProfileMenu = false">Trang cá nhân</a>
-              <a routerLink="/settings" (click)="showProfileMenu = false">Cài đặt</a>
-              <hr>
-              <button (click)="logout(); showProfileMenu = false" class="logout-btn">Đăng xuất</button>
             </div>
-          </div>
+          </ng-container>
         </ng-container>
       </div>
     </div>

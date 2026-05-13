@@ -2,17 +2,13 @@ import { NgModule, Optional, SkipSelf } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { JwtInterceptor } from './interceptors/jwt.interceptor';
-import { AuthGuard } from './guards/auth.guard';
-import { GuestGuard } from './guards/guest.guard';
 
 @NgModule({
   imports: [
     CommonModule
   ],
   providers: [
-    { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
-    AuthGuard,
-    GuestGuard
+    { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true }
   ]
 })
 export class CoreModule {

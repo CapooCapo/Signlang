@@ -36,7 +36,7 @@ INSTALLED_APPS = [
     'channels',
 
     # Local apps
-    'users.apps.UsersConfig',
+    'accounts.apps.AccountsConfig',
     'community.apps.CommunityConfig',
     'profiles.apps.ProfilesConfig',
 ]
@@ -105,10 +105,14 @@ USE_TZ = True
 STATIC_URL = 'static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
+# Media files
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Custom User Model
-AUTH_USER_MODEL = 'users.User'
+AUTH_USER_MODEL = 'accounts.User'
 
 # REST Framework Configuration
 REST_FRAMEWORK = {
@@ -129,6 +133,10 @@ REST_FRAMEWORK = {
         'auth': '60/minute',
     },
     'EXCEPTION_HANDLER': 'backend.common.exceptions.exception_handler',
+    'DEFAULT_RENDERER_CLASSES': (
+        'backend.common.renderers.CoreJSONRenderer',
+        'rest_framework.renderers.BrowsableAPIRenderer',
+    ),
 }
 
 # Simple JWT Configuration
@@ -204,4 +212,3 @@ CHANNEL_LAYERS = {
         },
     },
 }
-

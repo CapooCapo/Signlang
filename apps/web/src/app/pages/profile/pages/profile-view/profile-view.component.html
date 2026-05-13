@@ -16,7 +16,8 @@
         [userProfile]="userProfile()!" 
         [isOwnProfile]="isOwnProfile()"
         (edit)="onEdit()"
-        (share)="onShare()">
+        (share)="onShare()"
+        (upload)="onUpload($event)">
       </app-profile-header>
 
       <app-profile-tabs 

@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { HomePageComponent } from './pages/home-page/home-page.component';
 import { LayoutComponent } from './layout.component';
-import { AuthGuard } from '../../core/guards/auth.guard';
+import { authGuard } from '../../core/guards/auth.guard';
 
 const routes: Routes = [
   {
@@ -12,7 +12,7 @@ const routes: Routes = [
       { path: '', component: HomePageComponent, pathMatch: 'full' },
       {
         path: 'learning-lab',
-        canActivate: [AuthGuard],
+        canActivate: [authGuard],
         loadChildren: () => import('../learning-lab/learning-lab.module').then(m => m.LearningLabModule)
       },
       {

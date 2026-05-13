@@ -1,17 +1,19 @@
 <div class="profile-header glass">
   <div class="cover-image">
-    <img [src]="userProfile().profile.cover_image || 'assets/default-cover.jpg'" alt="Cover">
+    <img [src]="userProfile().profile.cover_image || 'https://placehold.co/800x200/1e293b/ffffff?text=Cover+Image'" alt="Cover">
     @if (isOwnProfile()) {
-      <button class="edit-cover-btn" (click)="onEdit()">📷 Đổi ảnh bìa</button>
+      <button class="edit-cover-btn" (click)="coverInput.click()">📷 Đổi ảnh bìa</button>
+      <input #coverInput type="file" (change)="onFileSelected($event, 'cover_image')" hidden accept="image/*">
     }
   </div>
 
   <div class="header-content">
     <div class="avatar-section">
       <div class="avatar-container">
-        <img [src]="userProfile().profile.avatar || 'assets/default-avatar.png'" [alt]="userProfile().full_name" class="avatar">
+        <img [src]="userProfile().avatar || 'https://placehold.co/150x150/3b82f6/ffffff?text=Avatar'" [alt]="userProfile().full_name" class="avatar">
         @if (isOwnProfile()) {
-          <button class="edit-avatar-btn" (click)="onEdit()">📷</button>
+          <button class="edit-avatar-btn" (click)="avatarInput.click()">📷</button>
+          <input #avatarInput type="file" (change)="onFileSelected($event, 'avatar')" hidden accept="image/*">
         }
       </div>
     </div>

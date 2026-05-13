@@ -3,7 +3,7 @@ import jwt
 from channels.db import database_sync_to_async
 from django.contrib.auth.models import AnonymousUser
 from django.conf import settings
-from users.models import User
+from accounts.models import User
 from urllib.parse import parse_qs
 
 @database_sync_to_async

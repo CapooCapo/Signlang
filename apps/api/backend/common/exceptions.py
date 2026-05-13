@@ -29,6 +29,7 @@ def exception_handler(exc, context):
             error_message = response.data[0]
 
         response.data = {
+            "success": False,
             "status": response.status_code,
             "message": error_message or "An error occurred.",
             "object": response.data
@@ -37,6 +38,7 @@ def exception_handler(exc, context):
         # Unhandled exceptions (500 errors)
         logger.error(f"Unhandled exception: {str(exc)}", exc_info=True)
         return Response({
+            "success": False,
             "status": 500,
             "message": "Internal Server Error. Please contact support.",
             "object": {"detail": str(exc)} if context.get('request').user.is_staff else {}

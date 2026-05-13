@@ -1,5 +1,6 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { ProfileService, PrivacySettings } from '../../../../core/services/profile.service';
+import { ProfileService } from '../../../../core/services/profile.service';
+import { PrivacySettings } from '../../../../core/models/user.model';
 
 @Component({
   selector: 'app-privacy-settings',
